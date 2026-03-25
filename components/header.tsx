@@ -16,12 +16,6 @@ export function Header() {
         </div>
       </div>
       <div className="flex items-center gap-1">
-        <button className="h-10 px-4 flex items-center gap-2 rounded-full border border-gray-200 hover:border-gray-300 transition-colors text-sm font-medium text-[#161616] bg-white">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-          </svg>
-          Ask AI
-        </button>
         <button className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors">
           <Heart className="w-5 h-5 text-[#161616]" />
         </button>
