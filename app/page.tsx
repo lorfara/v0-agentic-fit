@@ -211,14 +211,6 @@ export default function Home() {
                 Submit my answers
                 <ArrowRight className="w-4 h-4" />
               </Button>
-              <Button
-                onClick={() => goTo(1)}
-                variant="outline"
-                className="border border-[#e5e5e5] text-[#161616] hover:bg-[#f5f5f5] px-5 py-2.5 h-auto text-sm font-semibold rounded-full bg-white flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Edit idea
-              </Button>
             </div>
           </div>
         )}
