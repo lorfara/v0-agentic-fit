@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { Check, Zap, X } from "lucide-react"
 
 type VerdictType = "go" | "narrow" | "no-build"
 
@@ -9,38 +10,39 @@ interface VerdictBannerProps {
 
 const verdictConfig = {
   go: {
-    bg: "bg-[#e8f5e8] border-[#a0cca0]",
-    iconBg: "bg-[#2a7c2a]",
-    labelColor: "text-[#2a7c2a]",
-    icon: "✓",
+    bg: "bg-green-light border-green/30",
+    iconBg: "bg-green",
+    labelColor: "text-green",
+    Icon: Check,
   },
   narrow: {
-    bg: "bg-amber-light border-[#e0c090]",
-    iconBg: "bg-amber",
-    labelColor: "text-amber-dark",
-    icon: "⚡",
+    bg: "bg-orange-light border-orange/30",
+    iconBg: "bg-orange",
+    labelColor: "text-orange",
+    Icon: Zap,
   },
   "no-build": {
-    bg: "bg-[#fce8e6] border-[#e0a090]",
-    iconBg: "bg-red-soft",
-    labelColor: "text-red-soft",
-    icon: "✕",
+    bg: "bg-red-light border-red/30",
+    iconBg: "bg-red",
+    labelColor: "text-red",
+    Icon: X,
   },
 }
 
 export function VerdictBanner({ type, title }: VerdictBannerProps) {
   const config = verdictConfig[type]
+  const IconComponent = config.Icon
 
   return (
-    <div className={cn("rounded-[16px] p-6 px-7 mb-5 flex items-center gap-4 border-[1.5px]", config.bg)}>
-      <div className={cn("w-12 h-12 rounded-full flex items-center justify-center text-[22px] shrink-0 text-white", config.iconBg)}>
-        {config.icon}
+    <div className={cn("rounded-2xl p-6 px-7 mb-5 flex items-center gap-5 border", config.bg)}>
+      <div className={cn("w-14 h-14 rounded-full flex items-center justify-center shrink-0 text-white shadow-lg", config.iconBg)}>
+        <IconComponent className="w-7 h-7" strokeWidth={2.5} />
       </div>
       <div>
-        <div className={cn("font-mono text-[11px] uppercase tracking-[0.1em] mb-1", config.labelColor)}>
+        <div className={cn("text-xs font-semibold uppercase tracking-wider mb-1", config.labelColor)}>
           Recommendation
         </div>
-        <div className="font-serif text-[22px] text-ink">
+        <div className="text-2xl font-bold text-ink tracking-tight">
           {title}
         </div>
       </div>

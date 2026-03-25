@@ -10,25 +10,25 @@ export function OutputSection({ label, children, variant = "default" }: OutputSe
   return (
     <div
       className={cn(
-        "rounded-[16px] p-[22px] px-6 mb-4",
-        variant === "default" && "bg-paper-card border border-border-soft shadow-[0_2px_12px_rgba(26,24,20,0.08)]",
+        "rounded-2xl p-6 mb-4",
+        variant === "default" && "bg-surface border border-border shadow-sm",
         variant === "dark" && "bg-ink text-white"
       )}
     >
       <div
         className={cn(
-          "font-mono text-[11px] uppercase tracking-[0.08em] mb-2.5",
+          "text-xs font-semibold uppercase tracking-wider mb-3",
           variant === "default" && "text-ink-muted",
-          variant === "dark" && "text-white/40"
+          variant === "dark" && "text-white/50"
         )}
       >
         {label}
       </div>
       <div
         className={cn(
-          "text-[15px] leading-relaxed",
+          "text-base leading-relaxed",
           variant === "default" && "text-ink-soft",
-          variant === "dark" && "text-white/85"
+          variant === "dark" && "text-white/90"
         )}
       >
         {children}
