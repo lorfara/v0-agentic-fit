@@ -12,9 +12,10 @@ const steps = [
 
 interface ProgressBarProps {
   currentStep: number
+  onStepClick?: (stepId: number) => void
 }
 
-export function ProgressBar({ currentStep }: ProgressBarProps) {
+export function ProgressBar({ currentStep, onStepClick }: ProgressBarProps) {
   return (
     <div className="bg-white border-b border-[#e5e5e5] px-4 md:px-6 py-4">
       <div className="flex items-center gap-0 max-w-[700px] mx-auto">
@@ -22,26 +23,32 @@ export function ProgressBar({ currentStep }: ProgressBarProps) {
           const isDone = step.id < currentStep
           const isActive = step.id === currentStep
           const isLast = index === steps.length - 1
+          const isLoading = step.id === 2 || step.id === 5
+          const isClickable = isDone && !isLoading && onStepClick
 
           return (
             <div key={step.id} className="flex flex-col items-center gap-1.5 flex-1 relative">
               {/* Connector line */}
               {!isLast && (
-                <div 
+                <div
                   className={cn(
                     "absolute top-3 left-1/2 w-full h-[2px] z-0 transition-colors",
                     isDone ? "bg-[#FF6B00]" : "bg-[#e5e5e5]"
-                  )} 
+                  )}
                 />
               )}
-              
+
               {/* Dot */}
-              <div
+              <button
+                onClick={() => isClickable && onStepClick(step.id)}
+                disabled={!isClickable}
                 className={cn(
                   "w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold relative z-10 transition-all",
                   isDone && "bg-[#FF6B00] text-white",
                   isActive && "bg-[#FF6B00] text-white ring-4 ring-[#FF6B00]/20",
-                  !isDone && !isActive && "bg-white border-2 border-[#e5e5e5] text-[#8a8a8a]"
+                  !isDone && !isActive && "bg-white border-2 border-[#e5e5e5] text-[#8a8a8a]",
+                  isClickable && "cursor-pointer hover:scale-110 hover:shadow-md",
+                  !isClickable && "cursor-default"
                 )}
               >
                 {isDone ? (
@@ -49,16 +56,18 @@ export function ProgressBar({ currentStep }: ProgressBarProps) {
                 ) : (
                   <span className="text-[11px]">{step.id}</span>
                 )}
-              </div>
-              
+              </button>
+
               {/* Label */}
               <div
                 className={cn(
                   "text-[11px] text-center leading-tight max-w-16 font-medium hidden md:block",
                   isDone && "text-[#4a4a4a]",
                   isActive && "text-[#FF6B00]",
-                  !isDone && !isActive && "text-[#8a8a8a]"
+                  !isDone && !isActive && "text-[#8a8a8a]",
+                  isClickable && "cursor-pointer"
                 )}
+                onClick={() => isClickable && onStepClick(step.id)}
               >
                 {step.label}
               </div>

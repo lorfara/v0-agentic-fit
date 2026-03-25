@@ -65,6 +65,14 @@ const progressMap: Record<number, number> = {
   5: 6,
 }
 
+// Maps progress step id → panel number (only for navigable steps)
+const stepToPanel: Record<number, number> = {
+  1: 1,
+  3: 3,
+  4: 3,
+  6: 5,
+}
+
 export default function Home() {
   const [currentPanel, setCurrentPanel] = useState(1)
   const [idea, setIdea] = useState("")
@@ -79,6 +87,14 @@ export default function Home() {
       newAnswers[index] = value
       return newAnswers
     })
+  }
+
+  const handleStepClick = (stepId: number) => {
+    const panel = stepToPanel[stepId]
+    if (panel !== undefined) {
+      setCurrentPanel(panel)
+      window.scrollTo(0, 0)
+    }
   }
 
   const goTo = (panel: number) => {
@@ -114,7 +130,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
       <Header />
-      <ProgressBar currentStep={currentStep} />
+      <ProgressBar currentStep={currentStep} onStepClick={handleStepClick} />
 
       <main className="max-w-[680px] mx-auto px-4 py-8 pb-16">
         {/* Panel 1: Idea Input */}
