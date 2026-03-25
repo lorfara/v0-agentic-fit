@@ -4,50 +4,50 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Kayak-inspired color palette */
+  /* Kayak-inspired color palette - exact match */
   --orange: #FF6B00;
-  --orange-light: #FFF4ED;
-  --orange-hover: #E86200;
-  --ink: #161616;
-  --ink-soft: #4a4a4a;
-  --ink-muted: #8a8a8a;
-  --surface: #ffffff;
-  --surface-muted: #f5f5f5;
-  --surface-hover: #fafafa;
-  --border: #e0e0e0;
-  --border-soft: #ebebeb;
-  --green: #00A651;
-  --green-light: #E8F5E8;
-  --red: #E63946;
-  --red-light: #FCE8E6;
-  --yellow: #FFB800;
-  --yellow-light: #FFF8E6;
-  --radius: 16px;
-  --radius-lg: 24px;
-  --radius-full: 9999px;
+  --orange-hover: #E55D00;
+  --orange-light: #FFF0E6;
+  --black: #161616;
+  --gray-900: #1a1a1a;
+  --gray-700: #4a4a4a;
+  --gray-500: #8a8a8a;
+  --gray-300: #d1d1d1;
+  --gray-200: #e5e5e5;
+  --gray-100: #f5f5f5;
+  --gray-50: #fafafa;
+  --white: #ffffff;
+  --green: #00875A;
+  --green-light: #E3F5ED;
+  --red: #DE350B;
+  --red-light: #FFEBE6;
+  --yellow: #FF991F;
+  --yellow-light: #FFF7E6;
 
-  --background: var(--surface-muted);
-  --foreground: var(--ink);
-  --card: var(--surface);
-  --card-foreground: var(--ink);
-  --popover: var(--surface);
-  --popover-foreground: var(--ink);
+  --background: var(--gray-100);
+  --foreground: var(--black);
+  --card: var(--white);
+  --card-foreground: var(--black);
+  --popover: var(--white);
+  --popover-foreground: var(--black);
   --primary: var(--orange);
-  --primary-foreground: #ffffff;
-  --secondary: var(--surface-muted);
-  --secondary-foreground: var(--ink-soft);
-  --muted: var(--surface-muted);
-  --muted-foreground: var(--ink-muted);
-  --accent: var(--orange);
-  --accent-foreground: #ffffff;
+  --primary-foreground: var(--white);
+  --secondary: var(--gray-100);
+  --secondary-foreground: var(--gray-700);
+  --muted: var(--gray-100);
+  --muted-foreground: var(--gray-500);
+  --accent: var(--orange-light);
+  --accent-foreground: var(--orange);
   --destructive: var(--red);
-  --destructive-foreground: #ffffff;
-  --input: var(--border);
+  --destructive-foreground: var(--white);
+  --border: var(--gray-200);
+  --input: var(--gray-200);
   --ring: var(--orange);
+  --radius: 12px;
 }
 
 @theme inline {
-  --font-sans: var(--font-sans), system-ui, sans-serif;
+  --font-sans: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: var(--font-mono), ui-monospace, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -68,28 +68,10 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) - 8px);
-  --radius-md: calc(var(--radius) - 4px);
-  --radius-lg: var(--radius);
-  --radius-xl: var(--radius-lg);
-
-  /* Custom colors */
-  --color-orange: var(--orange);
-  --color-orange-light: var(--orange-light);
-  --color-orange-hover: var(--orange-hover);
-  --color-ink: var(--ink);
-  --color-ink-soft: var(--ink-soft);
-  --color-ink-muted: var(--ink-muted);
-  --color-surface: var(--surface);
-  --color-surface-muted: var(--surface-muted);
-  --color-surface-hover: var(--surface-hover);
-  --color-border-soft: var(--border-soft);
-  --color-green: var(--green);
-  --color-green-light: var(--green-light);
-  --color-red: var(--red);
-  --color-red-light: var(--red-light);
-  --color-yellow: var(--yellow);
-  --color-yellow-light: var(--yellow-light);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 }
 
 @layer base {
@@ -97,14 +79,14 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-surface-muted text-ink;
+    @apply bg-[#f5f5f5] text-[#161616] antialiased;
   }
 }
 
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -115,7 +97,7 @@
 @keyframes pulse-dot {
   0%, 100% {
     opacity: 0.3;
-    transform: scale(0.8);
+    transform: scale(0.85);
   }
   50% {
     opacity: 1;
@@ -124,30 +106,24 @@
 }
 
 @keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .animate-fade-up {
-  animation: fadeUp 0.5s ease both;
+  animation: fadeUp 0.4s ease-out both;
 }
 
 .animate-pulse-dot {
-  animation: pulse-dot 1.2s ease-in-out infinite;
+  animation: pulse-dot 1.4s ease-in-out infinite;
 }
 
 .animate-pulse-dot-delay-1 {
-  animation: pulse-dot 1.2s ease-in-out infinite;
-  animation-delay: 0.2s;
+  animation: pulse-dot 1.4s ease-in-out infinite 0.2s;
 }
 
 .animate-pulse-dot-delay-2 {
-  animation: pulse-dot 1.2s ease-in-out infinite;
-  animation-delay: 0.4s;
+  animation: pulse-dot 1.4s ease-in-out infinite 0.4s;
 }
 
 .animate-spin-slow {

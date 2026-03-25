@@ -16,21 +16,21 @@ interface ProgressBarProps {
 
 export function ProgressBar({ currentStep }: ProgressBarProps) {
   return (
-    <div className="bg-surface border-b border-border px-6 md:px-10 py-5">
-      <div className="flex items-center gap-0 max-w-[720px] mx-auto">
+    <div className="bg-white border-b border-[#e5e5e5] px-4 md:px-6 py-4">
+      <div className="flex items-center gap-0 max-w-[700px] mx-auto">
         {steps.map((step, index) => {
           const isDone = step.id < currentStep
           const isActive = step.id === currentStep
           const isLast = index === steps.length - 1
 
           return (
-            <div key={step.id} className="flex flex-col items-center gap-2 flex-1 relative">
+            <div key={step.id} className="flex flex-col items-center gap-1.5 flex-1 relative">
               {/* Connector line */}
               {!isLast && (
                 <div 
                   className={cn(
-                    "absolute top-[14px] left-1/2 w-full h-0.5 z-0 transition-colors",
-                    isDone ? "bg-orange" : "bg-border"
+                    "absolute top-3 left-1/2 w-full h-[2px] z-0 transition-colors",
+                    isDone ? "bg-[#FF6B00]" : "bg-[#e5e5e5]"
                   )} 
                 />
               )}
@@ -38,26 +38,26 @@ export function ProgressBar({ currentStep }: ProgressBarProps) {
               {/* Dot */}
               <div
                 className={cn(
-                  "w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold relative z-10 transition-all duration-300",
-                  isDone && "bg-orange text-white",
-                  isActive && "bg-orange text-white shadow-[0_0_0_4px_rgba(255,107,0,0.2)]",
-                  !isDone && !isActive && "bg-surface border-2 border-border text-ink-muted"
+                  "w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold relative z-10 transition-all",
+                  isDone && "bg-[#FF6B00] text-white",
+                  isActive && "bg-[#FF6B00] text-white ring-4 ring-[#FF6B00]/20",
+                  !isDone && !isActive && "bg-white border-2 border-[#e5e5e5] text-[#8a8a8a]"
                 )}
               >
                 {isDone ? (
-                  <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                  <Check className="w-3 h-3" strokeWidth={3} />
                 ) : (
-                  <span>{step.id}</span>
+                  <span className="text-[11px]">{step.id}</span>
                 )}
               </div>
               
               {/* Label */}
               <div
                 className={cn(
-                  "text-xs text-center leading-tight max-w-20 font-medium",
-                  isDone && "text-ink-soft",
-                  isActive && "text-orange",
-                  !isDone && !isActive && "text-ink-muted"
+                  "text-[11px] text-center leading-tight max-w-16 font-medium hidden md:block",
+                  isDone && "text-[#4a4a4a]",
+                  isActive && "text-[#FF6B00]",
+                  !isDone && !isActive && "text-[#8a8a8a]"
                 )}
               >
                 {step.label}

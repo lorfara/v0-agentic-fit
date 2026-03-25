@@ -10,7 +10,7 @@ import { ComparableItem } from "@/components/comparable-item"
 import { OutputSection } from "@/components/output-section"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Info, AlertTriangle, ArrowRight, ArrowLeft, FileDown, Sparkles } from "lucide-react"
+import { AlertTriangle, ArrowRight, ArrowLeft, FileDown, Sparkles, Info } from "lucide-react"
 
 const questions = [
   {
@@ -57,7 +57,6 @@ const comparables = [
   },
 ]
 
-// Map panel to progress step
 const progressMap: Record<number, number> = {
   1: 1,
   2: 2,
@@ -90,14 +89,12 @@ export default function Home() {
       }
       setIdeaError(false)
       setCurrentPanel(2)
-      // After loading, show questions
       setTimeout(() => {
         setCurrentPanel(3)
         window.scrollTo(0, 0)
       }, 2400)
     } else if (panel === 4) {
       setCurrentPanel(4)
-      // After loading, show verdict
       setTimeout(() => {
         setCurrentPanel(5)
         window.scrollTo(0, 0)
@@ -108,7 +105,6 @@ export default function Home() {
     }
   }
 
-  // Reset error when idea changes
   useEffect(() => {
     if (ideaError && idea.trim()) {
       setIdeaError(false)
@@ -116,50 +112,47 @@ export default function Home() {
   }, [idea, ideaError])
 
   return (
-    <div className="min-h-screen bg-surface-muted">
+    <div className="min-h-screen bg-[#f5f5f5]">
       <Header />
       <ProgressBar currentStep={currentStep} />
 
-      <main className="max-w-[720px] mx-auto px-5 py-10 pb-20">
+      <main className="max-w-[680px] mx-auto px-4 py-8 pb-16">
         {/* Panel 1: Idea Input */}
         {currentPanel === 1 && (
           <div className="animate-fade-up">
-            <div className="text-xs font-semibold text-orange uppercase tracking-wider mb-3">
-              Step 1 of 6
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-ink mb-3 tracking-tight">
-              {"What's your project idea"}<span className="text-orange">.</span>
+            <h1 className="text-3xl md:text-[40px] font-bold text-[#161616] mb-2 tracking-tight leading-tight">
+              {"What's your project idea"}<span className="text-[#FF6B00]">.</span>
             </h1>
-            <p className="text-base text-ink-soft leading-relaxed mb-8">
-              {"Give us a rough description — 2 to 3 sentences is enough. You don't need to have it figured out yet. That's what we're here for."}
+            <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
+              {"Give us a rough description — 2 to 3 sentences is enough."}
             </p>
 
-            <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm mb-6">
-              <label className="text-sm font-semibold text-ink mb-3 block">
+            <div className="bg-white border border-[#e5e5e5] rounded-2xl p-5 shadow-sm mb-5">
+              <label className="text-sm font-semibold text-[#161616] mb-2 block">
                 Describe your idea
               </label>
               <Textarea
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
-                placeholder="e.g. I want to build an AI tool that helps ER nurses reduce the time they spend on documentation after each patient visit. It would listen to their verbal notes, extract the key clinical details, and auto-fill the relevant fields in their EHR system."
-                className={`min-h-[120px] bg-surface-muted border-0 rounded-xl px-4 py-3.5 text-base text-ink leading-relaxed resize-y focus:ring-2 placeholder:text-ink-muted/60 transition-all ${
-                  ideaError ? "ring-2 ring-red/50" : "focus:ring-orange/20 focus-visible:ring-orange/20"
+                placeholder="e.g. I want to build an AI tool that helps ER nurses reduce the time they spend on documentation after each patient visit..."
+                className={`min-h-[120px] bg-[#f5f5f5] border-0 rounded-xl px-4 py-3 text-base text-[#161616] leading-relaxed resize-y focus:ring-2 placeholder:text-[#8a8a8a]/70 ${
+                  ideaError ? "ring-2 ring-[#DE350B]/50" : "focus:ring-[#FF6B00]/20"
                 }`}
               />
-              <p className="text-sm text-ink-muted mt-3">
-                {"This is your starting point, not your final submission. Be honest about what you're thinking — vague is fine."}
+              <p className="text-sm text-[#8a8a8a] mt-3">
+                {"This is your starting point, not your final submission."}
               </p>
             </div>
 
-            <div className="inline-flex items-center gap-2 bg-yellow-light border border-yellow/30 rounded-full px-4 py-2.5 text-sm text-ink-soft mb-8">
-              <AlertTriangle className="w-4 h-4 text-yellow" />
-              <span>Calibrated for 6–8 week student builds, not production systems</span>
+            <div className="inline-flex items-center gap-2 bg-[#FFF7E6] border border-[#FF991F]/20 rounded-full px-4 py-2 text-sm text-[#4a4a4a] mb-6">
+              <AlertTriangle className="w-4 h-4 text-[#FF991F]" />
+              <span>Calibrated for 6-8 week student builds</span>
             </div>
 
-            <div className="flex gap-3 items-center">
+            <div className="flex gap-3">
               <Button
                 onClick={() => goTo(2)}
-                className="bg-orange hover:bg-orange-hover text-white px-8 py-3 h-auto text-base font-semibold rounded-full transition-all hover:shadow-lg hover:shadow-orange/25 flex items-center gap-2"
+                className="bg-[#FF6B00] hover:bg-[#E55D00] text-white px-6 py-2.5 h-auto text-sm font-semibold rounded-full transition-all flex items-center gap-2"
               >
                 Analyze my idea
                 <ArrowRight className="w-4 h-4" />
@@ -168,12 +161,12 @@ export default function Home() {
           </div>
         )}
 
-        {/* Panel 2: Loading (Retrieval) */}
+        {/* Panel 2: Loading */}
         {currentPanel === 2 && (
           <div className="animate-fade-up">
             <LoadingCard
               status="Searching 200 past cohort projects"
-              title="Finding similar ideas and their outcomes..."
+              title="Finding similar ideas..."
             />
           </div>
         )}
@@ -181,24 +174,20 @@ export default function Home() {
         {/* Panel 3: Questions */}
         {currentPanel === 3 && (
           <div className="animate-fade-up">
-            <div className="text-xs font-semibold text-orange uppercase tracking-wider mb-3">
-              Step 3 of 6 — coaching questions
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-ink mb-3 tracking-tight">
-              Before you go further<span className="text-orange">.</span>
+            <h1 className="text-3xl md:text-[40px] font-bold text-[#161616] mb-2 tracking-tight leading-tight">
+              Before you go further<span className="text-[#FF6B00]">.</span>
             </h1>
-            <p className="text-base text-ink-soft leading-relaxed mb-8">
-              Based on similar past projects, these are the three gaps most likely to weaken your submission. Answer them honestly — the evaluator will use your answers.
+            <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
+              Based on similar past projects, answer these questions honestly.
             </p>
 
-            {/* Context Badge */}
-            <div className="bg-green-light border border-green/30 rounded-2xl p-4 px-5 flex items-start gap-3 mb-6">
-              <div className="w-8 h-8 bg-green rounded-full flex items-center justify-center shrink-0">
+            <div className="bg-[#E3F5ED] border border-[#00875A]/20 rounded-2xl p-4 flex items-start gap-3 mb-5">
+              <div className="w-8 h-8 bg-[#00875A] rounded-full flex items-center justify-center shrink-0">
                 <Info className="w-4 h-4 text-white" />
               </div>
-              <div className="text-sm text-ink leading-relaxed">
-                <strong className="font-semibold text-green">3 similar past projects retrieved.</strong>{" "}
-                Two of them hit data access issues in week 4. One pivoted scope at week 2 and shipped successfully. These questions target those patterns.
+              <div className="text-sm text-[#161616] leading-relaxed">
+                <strong className="font-semibold text-[#00875A]">3 similar past projects retrieved.</strong>{" "}
+                Two hit data access issues in week 4. These questions target those patterns.
               </div>
             </div>
 
@@ -214,10 +203,10 @@ export default function Home() {
               />
             ))}
 
-            <div className="flex gap-3 items-center mt-8">
+            <div className="flex gap-3 mt-6">
               <Button
                 onClick={() => goTo(4)}
-                className="bg-orange hover:bg-orange-hover text-white px-8 py-3 h-auto text-base font-semibold rounded-full transition-all hover:shadow-lg hover:shadow-orange/25 flex items-center gap-2"
+                className="bg-[#FF6B00] hover:bg-[#E55D00] text-white px-6 py-2.5 h-auto text-sm font-semibold rounded-full transition-all flex items-center gap-2"
               >
                 Submit my answers
                 <ArrowRight className="w-4 h-4" />
@@ -225,7 +214,7 @@ export default function Home() {
               <Button
                 onClick={() => goTo(1)}
                 variant="outline"
-                className="border-2 border-border text-ink hover:border-ink-soft hover:bg-surface-muted px-6 py-3 h-auto text-base font-semibold rounded-full bg-transparent flex items-center gap-2"
+                className="border border-[#e5e5e5] text-[#161616] hover:bg-[#f5f5f5] px-5 py-2.5 h-auto text-sm font-semibold rounded-full bg-white flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Edit idea
@@ -234,12 +223,12 @@ export default function Home() {
           </div>
         )}
 
-        {/* Panel 4: Loading (Evaluation) */}
+        {/* Panel 4: Loading */}
         {currentPanel === 4 && (
           <div className="animate-fade-up">
             <LoadingCard
               status="Running full evaluation"
-              title="Applying rubric to your full submission..."
+              title="Applying rubric to your submission..."
             />
           </div>
         )}
@@ -247,34 +236,26 @@ export default function Home() {
         {/* Panel 5: Verdict */}
         {currentPanel === 5 && (
           <div className="animate-fade-up">
-            <div className="text-xs font-semibold text-orange uppercase tracking-wider mb-3">
-              Step 6 of 6 — evaluation complete
-            </div>
-
-            {/* Idea Recap */}
-            <div className="bg-surface border border-border rounded-2xl p-5 text-base text-ink-soft leading-relaxed mb-6 shadow-sm">
-              <div className="text-xs font-semibold text-ink-muted uppercase tracking-wider mb-2">
+            <div className="bg-white border border-[#e5e5e5] rounded-2xl p-4 text-sm text-[#4a4a4a] leading-relaxed mb-5">
+              <div className="text-xs font-semibold text-[#8a8a8a] uppercase tracking-wider mb-1">
                 Your idea
               </div>
               <p className="italic">
-                {idea || "An AI tool that helps ER nurses reduce documentation time after patient visits — listens to verbal notes, extracts clinical details, and auto-fills EHR fields."}
+                {idea || "An AI tool that helps ER nurses reduce documentation time after patient visits."}
               </p>
             </div>
 
             <VerdictBanner type="narrow" title="Proceed with narrower scope" />
 
-            {/* Rationale */}
             <OutputSection label="Rationale">
-              {"This is a genuinely agentic problem — the system needs to listen, classify clinical significance, make field-mapping decisions, and handle variation across case types. The agentic signal is clear. However, the data access plan for a 6-week build is underspecified. Healthcare integrations with real EHR systems (Epic, Cerner) require months of API access negotiation. The idea is strong but needs a scoped-down MVP that sidesteps live EHR integration entirely."}
+              {"This is a genuinely agentic problem — the system needs to listen, classify clinical significance, make field-mapping decisions, and handle variation across case types. However, the data access plan for a 6-week build is underspecified. Healthcare integrations with real EHR systems require months of API access negotiation."}
             </OutputSection>
 
-            {/* MVP */}
             <OutputSection label="MVP suggestion — achievable in 6 weeks" variant="dark">
-              Build a voice-to-structured-note tool using synthetic clinical scenarios. Skip EHR integration entirely — output a formatted JSON summary that <em className="text-orange not-italic font-medium">could</em> map to Epic fields, but demonstrate via a simple UI. Source test data from publicly available anonymized clinical note datasets (MIMIC-III). This proves the core AI capability — the extraction and classification logic — without the operational complexity of real EHR access.
+              Build a voice-to-structured-note tool using synthetic clinical scenarios. Skip EHR integration entirely — output a formatted JSON summary that <em className="text-[#FF6B00] not-italic font-medium">could</em> map to Epic fields, but demonstrate via a simple UI.
             </OutputSection>
 
-            {/* Comparables */}
-            <OutputSection label="Similar past projects that influenced this verdict">
+            <OutputSection label="Similar past projects">
               {comparables.map((c, index) => (
                 <ComparableItem
                   key={c.id}
@@ -284,46 +265,44 @@ export default function Home() {
               ))}
             </OutputSection>
 
-            {/* Risk Flags */}
             <OutputSection label="Risk flags">
               <div className="flex flex-wrap gap-2 mb-3">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-red-light text-red">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FFEBE6] text-[#DE350B]">
                   Regulated domain
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-light text-yellow">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FFF7E6] text-[#FF991F]">
                   Data access complexity
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-light text-yellow">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FFF7E6] text-[#FF991F]">
                   EHR integration scope
                 </span>
               </div>
-              <p className="text-base text-ink-soft leading-relaxed mt-3">
-                Healthcare projects in this cohort have a 66% rate of scope-related pivots. This is not a reason to abandon the idea — {"it's"} a reason to define the MVP boundary precisely before Week 1 starts.
+              <p className="text-[15px] text-[#4a4a4a] leading-relaxed mt-3">
+                Healthcare projects have a 66% rate of scope-related pivots.
               </p>
             </OutputSection>
 
-            <div className="flex flex-wrap gap-3 items-center mt-8">
+            <div className="flex flex-wrap gap-3 mt-6">
               <Button
                 onClick={() => goTo(1)}
-                className="bg-orange hover:bg-orange-hover text-white px-8 py-3 h-auto text-base font-semibold rounded-full transition-all hover:shadow-lg hover:shadow-orange/25 flex items-center gap-2"
+                className="bg-[#FF6B00] hover:bg-[#E55D00] text-white px-6 py-2.5 h-auto text-sm font-semibold rounded-full transition-all flex items-center gap-2"
               >
                 <Sparkles className="w-4 h-4" />
                 Evaluate another idea
               </Button>
               <Button
                 variant="outline"
-                className="border-2 border-border text-ink hover:border-ink-soft hover:bg-surface-muted px-6 py-3 h-auto text-base font-semibold rounded-full bg-transparent flex items-center gap-2"
+                className="border border-[#e5e5e5] text-[#161616] hover:bg-[#f5f5f5] px-5 py-2.5 h-auto text-sm font-semibold rounded-full bg-white flex items-center gap-2"
               >
                 <FileDown className="w-4 h-4" />
                 Export as PDF
               </Button>
             </div>
 
-            {/* Disclaimer */}
-            <div className="bg-yellow-light border border-yellow/30 rounded-2xl p-4 px-5 text-sm text-ink-soft leading-relaxed mt-8 flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-yellow shrink-0 mt-0.5" />
+            <div className="bg-[#FFF7E6] border border-[#FF991F]/20 rounded-2xl p-4 text-sm text-[#4a4a4a] leading-relaxed mt-6 flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-[#FF991F] shrink-0 mt-0.5" />
               <span>
-                This evaluation is calibrated for an 8-week student build, not a production deployment. The AI may hallucinate. Use this as a starting point for discussion with your instructor, not a final verdict.
+                This evaluation is calibrated for an 8-week student build, not a production deployment.
               </span>
             </div>
           </div>

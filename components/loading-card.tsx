@@ -7,16 +7,16 @@ interface LoadingCardProps {
 
 export function LoadingCard({ status, title }: LoadingCardProps) {
   return (
-    <div className="bg-surface border border-border rounded-3xl p-12 text-center shadow-sm">
-      <div className="flex justify-center mb-6">
-        <div className="w-12 h-12 rounded-full bg-orange-light flex items-center justify-center">
-          <Loader2 className="w-6 h-6 text-orange animate-spin-slow" />
+    <div className="bg-white border border-[#e5e5e5] rounded-2xl p-10 text-center shadow-sm">
+      <div className="flex justify-center mb-5">
+        <div className="w-14 h-14 rounded-full bg-[#FFF0E6] flex items-center justify-center">
+          <Loader2 className="w-7 h-7 text-[#FF6B00] animate-spin" />
         </div>
       </div>
-      <div className="font-mono text-xs text-ink-muted tracking-wide uppercase mb-2">
+      <div className="text-xs text-[#8a8a8a] tracking-wide uppercase mb-2 font-medium">
         {status}
       </div>
-      <div className="text-xl font-semibold text-ink">
+      <div className="text-xl font-semibold text-[#161616]">
         {title}
       </div>
     </div>
