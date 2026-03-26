@@ -74,11 +74,13 @@ const stepToPanel: Record<number, number> = {
 }
 
 export default function Home() {
+  console.log("[v0] Home component rendering")
   const [currentPanel, setCurrentPanel] = useState(1)
   const [idea, setIdea] = useState("")
   const [answers, setAnswers] = useState(["", "", ""])
   const [ideaError, setIdeaError] = useState(false)
 
+  console.log("[v0] Current panel:", currentPanel)
   const currentStep = progressMap[currentPanel] || currentPanel
 
   const updateAnswer = (index: number, value: string) => {
