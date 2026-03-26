@@ -140,7 +140,7 @@ export default function Home() {
               {"What's your project idea"}<span className="text-[#FF6B00]">.</span>
             </h1>
             <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
-              {"Give us a rough description — 2 to 3 sentences is enough."}
+              {"Give us a rough description — 2 to 3 sentences is enough. Include a Project Name, Target Persona, the pain point and use case you are solving for, and your MOAT.  "}
             </p>
 
             <div className="bg-white border border-[#e5e5e5] rounded-2xl p-5 shadow-sm mb-5">
