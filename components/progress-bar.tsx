@@ -61,7 +61,7 @@ export function ProgressBar({ currentStep, onStepClick }: ProgressBarProps) {
               {/* Label */}
               <div
                 className={cn(
-                  "text-[11px] text-center leading-tight max-w-16 font-medium hidden md:block",
+                  "text-[11px] text-center leading-tight max-w-16 font-medium",
                   isDone && "text-[#4a4a4a]",
                   isActive && "text-[#FF6B00]",
                   !isDone && !isActive && "text-[#8a8a8a]",
