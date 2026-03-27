@@ -110,16 +110,13 @@ export default function Home() {
       setIsAnalyzing(true)
       
       try {
-        const response = await fetch(
-          "https://loreleifara.app.n8n.cloud/webhook-test/15167a45-4547-4f11-81e7-b8c718d2ad00",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ projectDescription: idea }),
-          }
-        )
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ projectDescription: idea }),
+        })
         const data = await response.json()
         setAnalysisResponse(data)
       } catch (error) {
@@ -214,9 +211,6 @@ export default function Home() {
             <h1 className="text-3xl md:text-[40px] font-bold text-[#161616] mb-2 tracking-tight leading-tight">
               Before you go further<span className="text-[#FF6B00]">.</span>
             </h1>
-            <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
-              Based on similar past projects, answer these three questions to improve your idea. 
-            </p>
 
             {analysisResponse && (
               <div className="bg-white border border-[#e5e5e5] rounded-2xl p-5 mb-5">
@@ -230,6 +224,10 @@ export default function Home() {
                 </pre>
               </div>
             )}
+
+            <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
+              Based on similar past projects, answer these three questions to improve your idea. 
+            </p>
 
             <div className="bg-[#E3F5ED] border border-[#00875A]/20 rounded-2xl p-4 flex items-start gap-3 mb-5">
               <div className="w-8 h-8 bg-[#00875A] rounded-full flex items-center justify-center shrink-0">
