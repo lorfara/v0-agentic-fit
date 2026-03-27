@@ -209,7 +209,7 @@ export default function Home() {
         {currentPanel === 3 && (
           <div className="animate-fade-up">
             <h1 className="text-3xl md:text-[40px] font-bold text-[#161616] mb-2 tracking-tight leading-tight">
-              Before you go further<span className="text-[#FF6B00]">.</span>
+              Before you go further
             </h1>
 
             <div className="bg-[#E3F5ED] border border-[#00875A]/20 rounded-2xl p-4 flex items-start gap-3 mb-5">
