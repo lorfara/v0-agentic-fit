@@ -2,16 +2,22 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
-    // Return mock analysis data for preview
-    const mockData = {
-      analysis: "Analysis complete",
-      findings: "Project has strong market potential",
-      projectDescription: body.projectDescription,
-      timestamp: new Date().toISOString()
-    }
+    // Forward the request to the n8n webhook
+    const response = await fetch(
+      "https://loreleifara.app.n8n.cloud/webhook-test/15167a45-4547-4f11-81e7-b8c718d2ad00",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ projectDescription: body.projectDescription }),
+      }
+    )
     
-    return new Response(JSON.stringify(mockData), {
-      status: 200,
+    const data = await response.json()
+    
+    return new Response(JSON.stringify(data), {
+      status: response.status,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -43,17 +49,4 @@ export async function OPTIONS(request: Request) {
       "Access-Control-Allow-Headers": "Content-Type"
     }
   })
-}
-    
-    return new Response(JSON.stringify(mockData), {
-      status: 200,
-      headers: { "Content-Type": "application/json" }
-    })
-  } catch (error) {
-    console.error("Webhook error:", error)
-    return new Response(
-      JSON.stringify({ error: "Failed to analyze idea" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    )
-  }
 }
