@@ -78,8 +78,6 @@ export default function Home() {
   const [idea, setIdea] = useState("")
   const [answers, setAnswers] = useState(["", "", ""])
   const [ideaError, setIdeaError] = useState(false)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysisResponse, setAnalysisResponse] = useState<unknown>(null)
 
   const currentStep = progressMap[currentPanel] || currentPanel
 
@@ -99,7 +97,7 @@ export default function Home() {
     }
   }
 
-  const goTo = async (panel: number) => {
+  const goTo = (panel: number) => {
     if (panel === 2) {
       if (!idea.trim()) {
         setIdeaError(true)
@@ -107,26 +105,10 @@ export default function Home() {
       }
       setIdeaError(false)
       setCurrentPanel(2)
-      setIsAnalyzing(true)
-      
-      try {
-        const response = await fetch("/api/analyze", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ projectDescription: idea }),
-        })
-        const data = await response.json()
-        setAnalysisResponse(data)
-      } catch (error) {
-        console.error("Error analyzing idea:", error)
-        setAnalysisResponse({ error: "Failed to analyze idea. Please try again." })
-      } finally {
-        setIsAnalyzing(false)
+      setTimeout(() => {
         setCurrentPanel(3)
         window.scrollTo(0, 0)
-      }
+      }, 2400)
     } else if (panel === 4) {
       setCurrentPanel(4)
       setTimeout(() => {
@@ -158,7 +140,7 @@ export default function Home() {
               {"What's your project idea"}<span className="text-[#FF6B00]">.</span>
             </h1>
             <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
-              {"Give us a rough description — 2 to 3 sentences is enough. Include a Project Name, Target Persona, the pain point and use case you are solving for, and your MOAT.  "}
+              {"Give us a rough description — 2 to 3 sentences is enough."}
             </p>
 
             <div className="bg-white border border-[#e5e5e5] rounded-2xl p-5 shadow-sm mb-5">
@@ -209,8 +191,11 @@ export default function Home() {
         {currentPanel === 3 && (
           <div className="animate-fade-up">
             <h1 className="text-3xl md:text-[40px] font-bold text-[#161616] mb-2 tracking-tight leading-tight">
-              Before you go further
+              Before you go further<span className="text-[#FF6B00]">.</span>
             </h1>
+            <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
+              Based on similar past projects, answer these questions honestly.
+            </p>
 
             <div className="bg-[#E3F5ED] border border-[#00875A]/20 rounded-2xl p-4 flex items-start gap-3 mb-5">
               <div className="w-8 h-8 bg-[#00875A] rounded-full flex items-center justify-center shrink-0">
@@ -221,23 +206,6 @@ export default function Home() {
                 Two hit data access issues in week 4. These questions target those patterns.
               </div>
             </div>
-
-            {analysisResponse && (
-              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-5 mb-5">
-                <div className="text-xs font-semibold text-[#8a8a8a] uppercase tracking-wider mb-2">
-                  Analysis Response
-                </div>
-                <pre className="text-sm text-[#161616] leading-relaxed whitespace-pre-wrap overflow-x-auto">
-                  {typeof analysisResponse === "object" 
-                    ? JSON.stringify(analysisResponse, null, 2) 
-                    : String(analysisResponse)}
-                </pre>
-              </div>
-            )}
-
-            <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
-              Based on similar past projects, answer these three questions to improve your idea. 
-            </p>
 
             {questions.map((q, index) => (
               <QuestionCard

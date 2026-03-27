@@ -7,7 +7,7 @@ const steps = [
   { id: 3, label: "Coach questions" },
   { id: 4, label: "Your answers" },
   { id: 5, label: "Evaluating" },
-  { id: 6, label: "Recommendation" },
+  { id: 6, label: "Verdict" },
 ]
 
 interface ProgressBarProps {
@@ -61,7 +61,7 @@ export function ProgressBar({ currentStep, onStepClick }: ProgressBarProps) {
               {/* Label */}
               <div
                 className={cn(
-                  "text-[11px] text-center leading-tight max-w-16 font-medium",
+                  "text-[11px] text-center leading-tight max-w-16 font-medium hidden md:block",
                   isDone && "text-[#4a4a4a]",
                   isActive && "text-[#FF6B00]",
                   !isDone && !isActive && "text-[#8a8a8a]",
