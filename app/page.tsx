@@ -97,7 +97,7 @@ export default function Home() {
     }
   }
 
-  const goTo = (panel: number) => {
+  const goTo = async (panel: number) => {
     if (panel === 2) {
       if (!idea.trim()) {
         setIdeaError(true)
@@ -105,6 +105,18 @@ export default function Home() {
       }
       setIdeaError(false)
       setCurrentPanel(2)
+
+      // Send idea to webhook via API route
+      try {
+        await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projectDescription: idea }),
+        })
+      } catch (error) {
+        console.error("Failed to send to webhook:", error)
+      }
+
       setTimeout(() => {
         setCurrentPanel(3)
         window.scrollTo(0, 0)
