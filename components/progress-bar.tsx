@@ -7,7 +7,7 @@ const steps = [
   { id: 3, label: "Coach questions" },
   { id: 4, label: "Your answers" },
   { id: 5, label: "Evaluating" },
-  { id: 6, label: "Verdict" },
+  { id: 6, label: "Recommendation" },
 ]
 
 interface ProgressBarProps {
