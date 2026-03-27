@@ -110,6 +110,7 @@ export default function Home() {
       setIsAnalyzing(true)
       
       try {
+        // Fetch analysis from API route (server-side proxy to avoid CORS)
         const response = await fetch("/api/analyze", {
           method: "POST",
           headers: {
