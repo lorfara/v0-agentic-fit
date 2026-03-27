@@ -212,6 +212,16 @@ export default function Home() {
               Before you go further<span className="text-[#FF6B00]">.</span>
             </h1>
 
+            <div className="bg-[#E3F5ED] border border-[#00875A]/20 rounded-2xl p-4 flex items-start gap-3 mb-5">
+              <div className="w-8 h-8 bg-[#00875A] rounded-full flex items-center justify-center shrink-0">
+                <Info className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-sm text-[#161616] leading-relaxed">
+                <strong className="font-semibold text-[#00875A]">3 similar past projects retrieved.</strong>{" "}
+                Two hit data access issues in week 4. These questions target those patterns.
+              </div>
+            </div>
+
             {analysisResponse && (
               <div className="bg-white border border-[#e5e5e5] rounded-2xl p-5 mb-5">
                 <div className="text-xs font-semibold text-[#8a8a8a] uppercase tracking-wider mb-2">
@@ -228,16 +238,6 @@ export default function Home() {
             <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
               Based on similar past projects, answer these three questions to improve your idea. 
             </p>
-
-            <div className="bg-[#E3F5ED] border border-[#00875A]/20 rounded-2xl p-4 flex items-start gap-3 mb-5">
-              <div className="w-8 h-8 bg-[#00875A] rounded-full flex items-center justify-center shrink-0">
-                <Info className="w-4 h-4 text-white" />
-              </div>
-              <div className="text-sm text-[#161616] leading-relaxed">
-                <strong className="font-semibold text-[#00875A]">3 similar past projects retrieved.</strong>{" "}
-                Two hit data access issues in week 4. These questions target those patterns.
-              </div>
-            </div>
 
             {questions.map((q, index) => (
               <QuestionCard
