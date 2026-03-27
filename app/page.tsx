@@ -194,7 +194,7 @@ export default function Home() {
               Before you go further<span className="text-[#FF6B00]">.</span>
             </h1>
             <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
-              Based on similar past projects, answer these questions to improve your idea. 
+              Based on similar past projects, answer these three questions to improve your idea. 
             </p>
 
             <div className="bg-[#E3F5ED] border border-[#00875A]/20 rounded-2xl p-4 flex items-start gap-3 mb-5">
