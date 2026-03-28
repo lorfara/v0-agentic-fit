@@ -1,8 +1,8 @@
 "use client"
-
+// v4 — agenticScore defined, safety check in place, no stale refs
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { AlertTriangle, ArrowRight, MessageSquare, X, Send } from "lucide-react"
+import { AlertTriangle, ArrowRight, MessageSquare, X } from "lucide-react"
 import type { EvaluationResponse } from "@/lib/types"
 
 interface EvalResultsProps {
@@ -14,9 +14,23 @@ interface EvalResultsProps {
 
 type Tab = 'agentic' | 'concerns' | 'similar' | 'questions'
 
-// Reusable Ask the Coach component
+// Reusable Ask the Coach chat interface component
 function AskTheCoach({ itemId, context }: { itemId: string; context: string }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [inputValue, setInputValue] = useState('')
+  const [messages, setMessages] = useState<Array<{ role: 'coach' | 'user'; text: string }>>([
+    { role: 'coach', text: "I'm focused on this specific point. What would you like to explore?" }
+  ])
+  
+  const handleSend = () => {
+    if (!inputValue.trim()) return
+    setMessages(prev => [...prev, { role: 'user', text: inputValue }])
+    setInputValue('')
+    // TODO: Add actual AI response logic here
+    setTimeout(() => {
+      setMessages(prev => [...prev, { role: 'coach', text: "That's a great question! Let me help you think through this..." }])
+    }, 500)
+  }
   
   return (
     <div className="mt-2">
@@ -29,14 +43,54 @@ function AskTheCoach({ itemId, context }: { itemId: string; context: string }) {
       </button>
       
       {isOpen && (
-        <div className="mt-3 bg-white border-2 border-[var(--orange)] rounded-lg overflow-hidden p-4">
-          <div className="flex items-center justify-between mb-3">
-            <button onClick={() => setIsOpen(false)} className="ml-auto text-[var(--muted)] hover:text-[var(--text)]">
+        <div className="mt-3 bg-white border-2 border-[var(--orange)] rounded-lg overflow-hidden flex flex-col min-h-[300px]">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-[var(--orange)] flex items-center justify-center">
+                <MessageSquare className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-bold text-sm text-[var(--text)]">AgenticFit Coach</span>
+            </div>
+            <button onClick={() => setIsOpen(false)} className="text-[var(--muted)] hover:text-[var(--text)] p-1">
               <X className="w-4 h-4" />
             </button>
           </div>
-          <div className="bg-gray-100 rounded-lg p-3">
-            <p className="text-sm text-[var(--text)]">{"I'm focused on this specific point. What would you like to explore?"}</p>
+          
+          {/* Chat messages area */}
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[180px]">
+            {messages.map((msg, idx) => (
+              <div key={idx} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
+                <div 
+                  className={cn(
+                    "max-w-[80%] rounded-lg px-3 py-2 text-sm",
+                    msg.role === 'coach' 
+                      ? "bg-gray-100 text-[var(--text)]" 
+                      : "bg-[var(--orange)] text-white"
+                  )}
+                >
+                  {msg.text}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Input area */}
+          <div className="border-t border-gray-200 p-3 flex items-center gap-2">
+            <input 
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              placeholder="Ask a follow-up..."
+              className="flex-1 py-2 px-3 border-2 border-gray-200 rounded-lg text-sm outline-none focus:border-[var(--orange)] transition-colors"
+            />
+            <button 
+              onClick={handleSend}
+              className="bg-[var(--orange)] text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[var(--orange-hover)] transition-colors"
+            >
+              Send
+            </button>
           </div>
         </div>
       )}
@@ -76,24 +130,13 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
   const { agentic_fit, industry_concerns = [], similar_projects = [], clarifying_questions = [] } = data
   const concerns = industry_concerns || []
 
-  // Determine banner color based on highest severity - safely check array
-  const highestSeverity = (concerns && concerns.length > 0) 
-    ? concerns.reduce((highest, concern) => {
-        const severityOrder = { 'Critical': 3, 'Significant': 2, 'Moderate': 1 }
-        return (severityOrder[concern.severity as keyof typeof severityOrder] || 0) > 
-               (severityOrder[highest.severity as keyof typeof severityOrder] || 0) 
-          ? concern 
-          : highest
-      }).severity
-    : 'Moderate'
-
-  const bannerStyles = {
-    'Critical': { bg: '#fee2e2', border: '#fca5a5', textBold: '#991b1b', textLight: '#7f1d1d' },
-    'Significant': { bg: '#fef3c7', border: '#fcd34d', textBold: '#92400e', textLight: '#78350f' },
-    'Moderate': { bg: '#d1fae5', border: '#6ee7b7', textBold: '#065f46', textLight: '#047857' }
+  // Map overall score to display label and color for the agentic fit content area
+  const agenticScoreMap: Record<string, { label: string; color: string }> = {
+    HIGH:   { label: 'STRONG FIT', color: '#16a34a' },
+    MEDIUM: { label: 'MEDIUM FIT', color: '#a16207' },
+    LOW:    { label: 'WEAK FIT',   color: '#dc2626' },
   }
-  
-  const style = bannerStyles[highestSeverity as keyof typeof bannerStyles] || bannerStyles.Moderate
+  const agenticScore = agenticScoreMap[agentic_fit?.overall_score?.toUpperCase() || ''] || null
 
   const tabs = [
     { id: 'agentic' as Tab, label: 'Agentic Fit' },
@@ -104,14 +147,6 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
 
   return (
     <div className="bg-white rounded-lg border border-[var(--border)] overflow-hidden" style={{ boxShadow: 'var(--shadow)' }}>
-      <div className="border-b-2 px-6 py-4 flex items-start gap-3" style={{ background: style.bg, borderColor: style.border }}>
-        <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: bannerStyles[highestSeverity as keyof typeof bannerStyles]?.border }} />
-        <div>
-          <div className="font-bold mb-1" style={{ color: style.textBold }}>High risk of not completing this project as described in 6 weeks.</div>
-          <div className="text-sm" style={{ color: style.textLight }}>Review the agentic fit assessment and concerns below. Answer the clarifying questions before strengthening your build.</div>
-        </div>
-      </div>
-
       <div className="border-b border-[var(--border)] flex">
         {tabs.map((tab) => (
           <button
