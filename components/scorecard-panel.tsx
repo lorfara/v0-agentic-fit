@@ -14,6 +14,18 @@ function getBadgeStyle(val: RiskLevel) {
   return { bg: "#dcfce7", color: "#16a34a", border: "#86efac" }
 }
 
+function getAgenticFitLabel(val: RiskLevel): string {
+  if (val === "Low") return "STRONG FIT"
+  if (val === "Medium") return "MEDIUM FIT"
+  return "WEAK FIT"
+}
+
+function getAgenticFitStyle(val: RiskLevel) {
+  if (val === "Low") return { bg: "#dcfce7", color: "#16a34a", border: "#86efac" }
+  if (val === "Medium") return { bg: "#fef9c3", color: "#a16207", border: "#fde047" }
+  return { bg: "#fee2e2", color: "#dc2626", border: "#fca5a5" }
+}
+
 function getOverallStyle(risk: RiskLevel) {
   if (risk === "High") return { bg: "#fee2e2", color: "#dc2626", border: "#fca5a5" }
   if (risk === "Medium") return { bg: "#fef9c3", color: "#a16207", border: "#fde047" }
@@ -43,29 +55,11 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
           <div className="text-sm font-semibold text-[var(--text)] mb-3">{projectName}</div>
         )}
 
-        {/* Build risk box */}
-        {scores ? (
-          <div
-            className="rounded-lg p-3 mb-4 text-center border"
-            style={(() => {
-              const s = getOverallStyle(scores.buildRisk)
-              return { background: s.bg, borderColor: s.border }
-            })()}
-          >
-            <div className="text-[10px] font-bold tracking-widest uppercase text-[var(--muted)] mb-1">6-Week Build Risk</div>
-            <div
-              className="text-xl font-black"
-              style={{ color: getOverallStyle(scores.buildRisk).color }}
-            >
-              {scores.buildRisk}
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-lg p-3 mb-4 text-center border border-[var(--border)] bg-[var(--bg)]">
-            <div className="text-[10px] font-bold tracking-widest uppercase text-[var(--muted)] mb-1">6-Week Build Risk</div>
-            <div className="text-xl font-black text-[var(--muted)]">—</div>
-          </div>
-        )}
+        {/* Build risk box — always dash (roadmap feature) */}
+        <div className="rounded-lg p-3 mb-4 text-center border border-[var(--border)] bg-[var(--bg)]">
+          <div className="text-[10px] font-bold tracking-widest uppercase text-[var(--muted)] mb-1">6-Week Build Risk</div>
+          <div className="text-xl font-black text-[var(--muted)]">—</div>
+        </div>
 
         {/* Score rows */}
         <div className="space-y-2 mb-4">
@@ -78,11 +72,11 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
                   <span
                     className="text-[10px] font-bold px-2 py-0.5 rounded border tracking-wide"
                     style={(() => {
-                      const s = getBadgeStyle(val)
+                      const s = key === 'agenticFit' ? getAgenticFitStyle(val) : getBadgeStyle(val)
                       return { background: s.bg, color: s.color, borderColor: s.border }
                     })()}
                   >
-                    {val.toUpperCase()}
+                    {key === 'agenticFit' ? getAgenticFitLabel(val) : val.toUpperCase()}
                   </span>
                 ) : (
                   <span className="text-[var(--muted)] text-sm">—</span>

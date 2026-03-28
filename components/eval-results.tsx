@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { AlertTriangle, ArrowRight, MessageSquare } from "lucide-react"
+import { AlertTriangle, ArrowRight, MessageSquare, X, Send } from "lucide-react"
 import type { EvaluationResponse } from "@/lib/types"
 
 interface EvalResultsProps {
@@ -13,6 +13,36 @@ interface EvalResultsProps {
 }
 
 type Tab = 'agentic' | 'concerns' | 'similar' | 'questions'
+
+// Reusable Ask the Coach component
+function AskTheCoach({ itemId, context }: { itemId: string; context: string }) {
+  const [isOpen, setIsOpen] = useState(false)
+  
+  return (
+    <div className="mt-2">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="text-[13px] font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] flex items-center gap-1.5"
+      >
+        <MessageSquare className="w-3.5 h-3.5" />
+        Ask the Coach
+      </button>
+      
+      {isOpen && (
+        <div className="mt-3 bg-white border-2 border-[var(--orange)] rounded-lg overflow-hidden p-4">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={() => setIsOpen(false)} className="ml-auto text-[var(--muted)] hover:text-[var(--text)]">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="bg-gray-100 rounded-lg p-3">
+            <p className="text-sm text-[var(--text)]">{"I'm focused on this specific point. What would you like to explore?"}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 const VERDICT_STYLES: Record<string, { bg: string; color: string }> = {
   'Strong fit': { bg: '#ecfdf5', color: '#059669' },
@@ -42,8 +72,9 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
     )
   }
   
-  // Map API field names to component names
-  const { agentic_fit, industry_concerns: concerns, similar_projects = [], clarifying_questions } = data
+  // Map API field names to component names with defaults
+  const { agentic_fit, industry_concerns = [], similar_projects = [], clarifying_questions = [] } = data
+  const concerns = industry_concerns
 
   // Determine banner color based on highest severity
   const highestSeverity = concerns.length > 0 
@@ -64,8 +95,15 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
   
   const style = bannerStyles[highestSeverity as keyof typeof bannerStyles] || bannerStyles.Moderate
 
+  const agenticScoreMap: Record<string, { label: string; color: string }> = {
+    HIGH:   { label: 'STRONG FIT', color: '#16a34a' },
+    MEDIUM: { label: 'MEDIUM FIT', color: '#a16207' },
+    LOW:    { label: 'WEAK FIT',   color: '#dc2626' },
+  }
+  const agenticScore = agenticScoreMap[agentic_fit?.overall_score?.toUpperCase() || ''] || null
+
   const tabs = [
-    { id: 'agentic' as Tab, label: 'Agentic Fit' },
+    { id: 'agentic' as Tab, label: 'Agentic Fit', scoreLabel: agenticScore?.label, scoreColor: agenticScore?.color },
     { id: 'concerns' as Tab, label: 'Concerns', count: concerns.length },
     { id: 'similar' as Tab, label: 'Similar Projects', count: similar_projects.length },
     { id: 'questions' as Tab, label: 'Questions', count: clarifying_questions.length }
@@ -92,6 +130,11 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
             )}
           >
             {tab.label}
+            {'scoreLabel' in tab && tab.scoreLabel && (
+              <span className="ml-1.5 font-bold text-xs" style={{ color: tab.scoreColor }}>
+                — {tab.scoreLabel}
+              </span>
+            )}
             {tab.count !== undefined && (
               <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-[var(--orange)] text-white text-xs font-bold">{tab.count}</span>
             )}
@@ -103,7 +146,12 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
         {activeTab === 'agentic' && (
           <div className="space-y-4">
             <div className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
-              <div className="text-[13px] font-bold text-[var(--muted)] mb-2 uppercase tracking-wide">{agentic_fit.overall_score}</div>
+              <div
+                className="text-[13px] font-bold mb-2 uppercase tracking-wide"
+                style={{ color: agenticScore?.color || 'var(--muted)' }}
+              >
+                {agenticScore?.label || agentic_fit.overall_score}
+              </div>
               <p className="text-sm text-[var(--text)]">{agentic_fit.justification}</p>
             </div>
             <div className="space-y-3">
@@ -118,11 +166,8 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
                         <span className="text-sm font-semibold" style={{ color: style.color }}>{criterion.verdict}</span>
                       </div>
                     </div>
-                    <div className="text-[13px] text-[var(--text-secondary)] leading-relaxed mb-2">{criterion.reasoning}</div>
-                    <button className="text-[13px] font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] flex items-center gap-1.5">
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      Ask AI about this
-                    </button>
+                    <div className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{criterion.reasoning}</div>
+                    <AskTheCoach itemId={`criterion-${index}`} context={criterion.name} />
                   </div>
                 )
               })}
@@ -151,11 +196,8 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
                     <span className="ml-auto text-xs font-semibold py-0.5 px-2 rounded" style={{ background: style.bg, color: style.color, border: `1px solid ${style.border}` }}>{concern.severity}</span>
                   </div>
                   <div className="text-sm text-[var(--muted)] mb-2 italic">Source: {concern.source}</div>
-                  <div className="text-sm text-[var(--text)] leading-relaxed mb-3">{concern.explanation}</div>
-                  <button className="text-[13px] font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] flex items-center gap-1.5">
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    Ask AI about this
-                  </button>
+                  <div className="text-sm text-[var(--text)] leading-relaxed">{concern.explanation}</div>
+                  <AskTheCoach itemId={`concern-${concern.rank}`} context={concern.label} />
                 </div>
               )
             })}
@@ -188,19 +230,16 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
                   <span className="w-7 h-7 rounded-full bg-[var(--blue)] text-white font-display text-[13px] font-black flex items-center justify-center shrink-0 mt-0.5">{q.question_number}</span>
                   <div className="flex-1">
                     <div className="text-[15px] font-bold text-[var(--text)] leading-snug mb-1.5">{q.question}</div>
-                    <div className="text-[13px] text-[var(--muted)] italic mb-2">Linked to: {q.linked_concern}</div>
-                    <button className="text-[13px] font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] flex items-center gap-1.5">
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      Ask AI about this
-                    </button>
                   </div>
                 </div>
+                <div className="text-[13px] text-[var(--muted)] italic mb-3">Linked to: {q.linked_concern}</div>
                 <textarea
                   value={questionAnswers[q.question_number] || ''}
                   onChange={(e) => onAnswerChange(q.question_number, e.target.value)}
                   placeholder="Type your answer here..."
-                  className="w-full py-3 px-4 border-2 border-[var(--border)] rounded-[var(--radius-sm)] font-sans text-sm text-[var(--text)] bg-white transition-all outline-none leading-relaxed resize-y min-h-[80px] placeholder:text-[#9ca3af]"
+                  className="w-full py-3 px-4 border-2 border-[var(--border)] rounded-[var(--radius-sm)] font-sans text-sm text-[var(--text)] bg-white transition-all outline-none leading-relaxed resize-y min-h-[80px] placeholder:text-[#9ca3af] mb-3"
                 />
+                <AskTheCoach itemId={`question-${q.question_number}`} context={q.question} />
               </div>
             ))}
             <div className="text-center mt-6">
