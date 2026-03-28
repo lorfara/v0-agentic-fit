@@ -1,5 +1,5 @@
 "use client"
-// v4 — agenticScore defined, safety check in place, no stale refs
+// v5 — safety check line 116, agenticScore line 134, concerns default line 131
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { AlertTriangle, ArrowRight, MessageSquare, X } from "lucide-react"
@@ -15,11 +15,12 @@ interface EvalResultsProps {
 type Tab = 'agentic' | 'concerns' | 'similar' | 'questions'
 
 // Reusable Ask the Coach chat interface component
-function AskTheCoach({ itemId, context }: { itemId: string; context: string }) {
+function AskTheCoach({ itemId, context, openingMessage }: { itemId: string; context: string; openingMessage?: string }) {
   const [isOpen, setIsOpen] = useState(false)
   const [inputValue, setInputValue] = useState('')
+  const defaultOpening = openingMessage || "I'm focused on this specific point. What would you like to explore?"
   const [messages, setMessages] = useState<Array<{ role: 'coach' | 'user'; text: string }>>([
-    { role: 'coach', text: "I'm focused on this specific point. What would you like to explore?" }
+    { role: 'coach', text: defaultOpening }
   ])
   
   const handleSend = () => {
@@ -60,10 +61,10 @@ function AskTheCoach({ itemId, context }: { itemId: string; context: string }) {
           {/* Chat messages area */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[180px]">
             {messages.map((msg, idx) => (
-              <div key={idx} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
+              <div key={idx} className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}>
                 <div 
                   className={cn(
-                    "max-w-[80%] rounded-lg px-3 py-2 text-sm",
+                    "rounded-lg px-3 py-2 text-sm",
                     msg.role === 'coach' 
                       ? "bg-gray-100 text-[var(--text)]" 
                       : "bg-[var(--orange)] text-white"
@@ -190,7 +191,11 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
                       </div>
                     </div>
                     <div className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{criterion.reasoning}</div>
-                    <AskTheCoach itemId={`criterion-${index}`} context={criterion.name} />
+                    <AskTheCoach 
+                      itemId={`criterion-${index}`} 
+                      context={criterion.name}
+                      openingMessage={`I can help you think through the ${criterion.name} dimension of your project. What would you like to explore about this?`}
+                    />
                   </div>
                 )
               })}
@@ -211,6 +216,13 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
           <div className="space-y-3">
             {concerns.map((concern) => {
               const style = SEVERITY_STYLES[concern.severity] || SEVERITY_STYLES.Moderate
+              // Find the clarifying question linked to this concern
+              const linkedQuestion = clarifying_questions.find(
+                (q) => q.linked_concern?.toLowerCase() === concern.label?.toLowerCase()
+              )
+              const openingMessage = linkedQuestion
+                ? `I can help you think through how to address ${concern.label} in your project. What's your current plan for ${linkedQuestion.question}`
+                : `I can help you think through how to address ${concern.label} in your project. What would you like to explore?`
               return (
                 <div key={concern.rank} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]" style={{ borderLeftWidth: '4px', borderLeftColor: style.color }}>
                   <div className="flex items-center justify-between mb-2">
@@ -225,7 +237,7 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
                   </div>
                   <div className="text-[13px] text-[var(--muted)] mb-2 italic">Source: {concern.source}</div>
                   <div className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{concern.explanation}</div>
-                  <AskTheCoach itemId={`concern-${concern.rank}`} context={concern.label} />
+                  <AskTheCoach itemId={`concern-${concern.rank}`} context={concern.label} openingMessage={openingMessage} />
                 </div>
               )
             })}
@@ -267,7 +279,11 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
                   placeholder="Type your answer here..."
                   className="w-full py-3 px-4 border-2 border-[var(--border)] rounded-[var(--radius-sm)] font-sans text-sm text-[var(--text)] bg-white transition-all outline-none leading-relaxed resize-y min-h-[80px] placeholder:text-[#9ca3af] mb-3"
                 />
-                <AskTheCoach itemId={`question-${q.question_number}`} context={q.question} />
+                <AskTheCoach 
+                  itemId={`question-${q.question_number}`} 
+                  context={q.question}
+                  openingMessage={`I can help you think through how to address ${q.linked_concern} in your project. What's your current plan for ${q.question}`}
+                />
               </div>
             ))}
             <div className="text-center mt-6">
