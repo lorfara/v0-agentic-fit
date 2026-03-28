@@ -157,6 +157,7 @@ export default function Home() {
     }
   }
 
+  // Evaluate project via server-side API proxy (v2)
   const handleEvaluate = async () => {
     setIsLoading(true)
     setRawApiResponse(null)
