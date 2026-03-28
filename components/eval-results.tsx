@@ -247,10 +247,10 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
           <div className="space-y-3">
             {similar_projects && similar_projects.length > 0 ? (
               similar_projects.map((project) => (
-                <div key={project.title} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
-                  <div className="font-bold text-[var(--text)] mb-1">{project.title}</div>
-                  <div className="text-sm text-[var(--muted)] mb-2">{project.industry}</div>
-                  <div className="text-sm text-[var(--text)]">{project.description}</div>
+                <div key={project.project_name} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
+                  <div className="font-bold text-[var(--text)] mb-0.5">{project.project_name}</div>
+                  <div className="text-[13px] text-[var(--muted)] italic mb-2">{project.student_name}</div>
+                  <div className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{project.similarity_reason}</div>
                 </div>
               ))
             ) : (
