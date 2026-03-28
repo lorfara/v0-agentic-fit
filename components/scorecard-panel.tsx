@@ -23,10 +23,14 @@ function ScoreRow({ label, value, rationale }: ScoreRowProps) {
   const getBadgeStyle = (val: RiskLevel | null) => {
     if (!val) return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)', text: '—' }
     switch (val) {
-      case 'High': return { bg: 'var(--red-bg)', color: 'var(--red)', border: 'var(--red-border)', text: 'HIGH' }
-      case 'Medium': return { bg: '#fef3c7', color: '#d97706', border: '#fcd34d', text: 'MEDIUM' }
-      case 'Low': return { bg: 'var(--green-bg)', color: 'var(--green)', border: 'var(--green-border)', text: 'LOW' }
-      default: return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)', text: '—' }
+      case 'High': 
+        return { bg: 'var(--red-bg)', color: 'var(--red)', border: 'var(--red-border)', text: 'HIGH' }
+      case 'Medium': 
+        return { bg: '#fef08a', color: '#c8a300', border: '#facc15', text: 'MEDIUM' }
+      case 'Low': 
+        return { bg: 'var(--green-bg)', color: 'var(--green)', border: 'var(--green-border)', text: 'LOW' }
+      default: 
+        return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)', text: '—' }
     }
   }
 
@@ -87,7 +91,7 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
     if (!risk) return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)' }
     switch (risk) {
       case 'Low': return { bg: 'var(--green-bg)', color: 'var(--green)', border: 'var(--green-border)' }
-      case 'Medium': return { bg: '#fef3c7', color: '#d97706', border: '#fcd34d' }
+      case 'Medium': return { bg: '#fef08a', color: '#c8a300', border: '#facc15' }
       case 'High': return { bg: 'var(--red-bg)', color: 'var(--red)', border: 'var(--red-border)' }
       default: return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)' }
     }
@@ -174,26 +178,36 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
 
           {/* Score Guide */}
           <div className="text-[13px] text-[var(--muted)] leading-relaxed bg-[var(--bg)] rounded-lg p-3">
-            <div className="font-semibold text-[var(--text-secondary)] mb-1.5">Score guide:</div>
-            <div className="flex items-center gap-1.5 flex-wrap mb-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-[var(--green)]"></span>
-              <span>Low = Strong</span>
-              <span className="text-[var(--muted)]">&middot;</span>
-              <span className="w-2.5 h-2.5 rounded-full bg-[var(--yellow)]"></span>
-              <span>Medium = Review</span>
-              <span className="text-[var(--muted)]">&middot;</span>
-              <span className="w-2.5 h-2.5 rounded-full bg-[var(--red)]"></span>
-              <span>High = Address</span>
+            <div className="font-semibold text-[var(--text-secondary)] mb-2.5">Score guide:</div>
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--green)] flex-shrink-0"></span>
+                <span>Low = Strong</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: '#eab308'}}></span>
+                <span>Medium = Review</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--red)] flex-shrink-0"></span>
+                <span>High = Address</span>
+              </div>
             </div>
-            <div className="mt-2 pt-2 border-t border-[var(--border)]">
-              <div className="font-semibold text-[var(--text-secondary)] mb-1">6-Week Build Risk:</div>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="w-2.5 h-2.5 rounded-full bg-[var(--green)]"></span>
-                <span>Low</span>
-                <span className="w-2.5 h-2.5 rounded-full bg-[var(--yellow)]"></span>
-                <span>Medium</span>
-                <span className="w-2.5 h-2.5 rounded-full bg-[var(--red)]"></span>
-                <span>High</span>
+            <div className="mt-3 pt-3 border-t border-[var(--border)]">
+              <div className="font-semibold text-[var(--text-secondary)] mb-2.5">6-Week Build Risk:</div>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[var(--green)] flex-shrink-0"></span>
+                  <span>Low</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: '#eab308'}}></span>
+                  <span>Medium</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[var(--red)] flex-shrink-0"></span>
+                  <span>High</span>
+                </div>
               </div>
             </div>
           </div>
