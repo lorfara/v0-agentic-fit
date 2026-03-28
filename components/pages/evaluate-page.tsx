@@ -2,7 +2,7 @@
 
 import { ProjectForm } from "@/components/project-form"
 import { EvaluationLoading } from "@/components/evaluation-loading"
-import { EvaluationResults } from "@/components/evaluation-results"
+import { EvalResults } from "@/components/eval-results"
 import { ScorecardPanel } from "@/components/scorecard-panel"
 import type { ProjectFormData, EvaluationResponse, Scores } from "@/lib/types"
 
@@ -17,6 +17,8 @@ interface EvaluatePageProps {
   onGoToCoach: () => void
   questionAnswers: Record<number, string>
   onAnswerChange: (questionNumber: number, answer: string) => void
+  rawApiResponse?: string | null
+  apiError?: string | null
 }
 
 export function EvaluatePage({
@@ -30,6 +32,8 @@ export function EvaluatePage({
   onGoToCoach,
   questionAnswers,
   onAnswerChange,
+  rawApiResponse,
+  apiError,
 }: EvaluatePageProps) {
   const showForm = !isLoading && !evaluationResponse
   const showLoading = isLoading
@@ -64,12 +68,28 @@ export function EvaluatePage({
           )}
 
           {showResults && evaluationResponse && (
-            <EvaluationResults
+            <EvalResults
               data={evaluationResponse}
               onGoToCoach={onGoToCoach}
               questionAnswers={questionAnswers}
               onAnswerChange={onAnswerChange}
             />
+          )}
+
+          {/* API Error Display */}
+          {apiError && (
+            <div className="mt-4 p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+              <div className="font-bold text-red-700 mb-2">API Error:</div>
+              <pre className="text-sm text-red-600 whitespace-pre-wrap font-mono">{apiError}</pre>
+            </div>
+          )}
+
+          {/* Raw API Response Display */}
+          {rawApiResponse && (
+            <div className="mt-4 p-4 bg-gray-50 border-2 border-gray-200 rounded-lg">
+              <div className="font-bold text-gray-700 mb-2">Raw API Response:</div>
+              <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono overflow-x-auto max-h-[400px] overflow-y-auto">{rawApiResponse}</pre>
+            </div>
           )}
         </div>
 

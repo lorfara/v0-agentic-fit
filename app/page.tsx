@@ -95,6 +95,8 @@ export default function Home() {
   const [evaluationResponse, setEvaluationResponse] = useState<EvaluationResponse | null>(null)
   const [scores, setScores] = useState<Scores | null>(null)
   const [questionAnswers, setQuestionAnswers] = useState<Record<number, string>>({})
+  const [rawApiResponse, setRawApiResponse] = useState<string | null>(null)
+  const [apiError, setApiError] = useState<string | null>(null)
   
   // Progress state
   const [evaluated, setEvaluated] = useState(false)
@@ -157,16 +159,50 @@ export default function Home() {
 
   const handleEvaluate = async () => {
     setIsLoading(true)
+    setRawApiResponse(null)
+    setApiError(null)
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 5500))
-    
-    const newScores = calculateScores(formData, 1)
-    setScores(newScores)
-    setEvaluationResponse(MOCK_EVALUATION_RESPONSE)
-    setEvaluated(true)
-    setIsLoading(false)
-    showToast('Evaluation complete — review your results below', 'success')
+    try {
+      const response = await fetch('https://loreleifara.app.n8n.cloud/webhook-test/15167a45-4547-4f11-81e7-b8c718d2ad00', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          projectName: formData.name,
+          targetPersona: formData.persona,
+          projectDescription: formData.what,
+          whyAgentic: formData.agentic,
+          moat: formData.moat
+        })
+      })
+      
+      const rawText = await response.text()
+      console.log('[v0] Raw API Response:', rawText)
+      setRawApiResponse(rawText)
+      
+      // Try to parse as JSON for the evaluation
+      try {
+        const jsonData = JSON.parse(rawText)
+        console.log('[v0] Parsed JSON:', jsonData)
+      } catch {
+        console.log('[v0] Response is not valid JSON')
+      }
+      
+      // Use mock response for now to keep UI working
+      const newScores = calculateScores(formData, 1)
+      setScores(newScores)
+      setEvaluationResponse(MOCK_EVALUATION_RESPONSE)
+      setEvaluated(true)
+      showToast('Evaluation complete — review your results below', 'success')
+    } catch (error) {
+      console.error('[v0] API Error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      setApiError(errorMessage)
+      showToast('Failed to evaluate — check the error message below', 'info')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleCancelLoading = () => {
@@ -238,6 +274,8 @@ export default function Home() {
           onGoToCoach={handleGoToCoach}
           questionAnswers={questionAnswers}
           onAnswerChange={handleAnswerChange}
+          rawApiResponse={rawApiResponse}
+          apiError={apiError}
         />
       )}
 
