@@ -2,21 +2,15 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import type { Scores, RiskLevel } from "@/lib/types"
 import { BarChart3 } from "lucide-react"
+import type { Scores, RiskLevel } from "@/lib/types"
 
 interface ScorecardPanelProps {
-  projectName: string
-  scores: Scores | null
+  projectName?: string
+  scores?: Scores
 }
 
-interface ScoreRowProps {
-  label: string
-  value: RiskLevel | null
-  rationale: string
-}
-
-function ScoreRow({ label, value, rationale }: ScoreRowProps) {
+function ScoreRow({ label, value, rationale }: { label: string; value: RiskLevel | null; rationale: string }) {
   const [isOpen, setIsOpen] = useState(false)
 
   const getBadgeStyle = (val: RiskLevel | null) => {
@@ -31,22 +25,10 @@ function ScoreRow({ label, value, rationale }: ScoreRowProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2.5 flex-wrap gap-1">
-        <span 
-          className={cn(
-            "text-sm font-semibold text-[var(--text-secondary)] cursor-pointer flex items-center gap-1.5 hover:text-[var(--orange)]",
-            isOpen && "text-[var(--orange)]"
-          )}
-          onClick={() => setIsOpen(!isOpen)}
-          title="Click for rationale"
-        >
+      <div className="flex items-center justify-between mb-1 cursor-pointer" onClick={() => setIsOpen(!isOpen)} title="Click for rationale">
+        <span className={cn("text-sm text-[var(--text)]", "hover:text-[var(--text-secondary)] transition-colors")}>
           {label}
-          <span 
-            className={cn(
-              "text-sm text-[var(--muted)] transition-transform inline-block",
-              isOpen && "rotate-90"
-            )}
-          >
+          <span className={cn("text-xs text-[var(--muted)] transition-transform inline-block ml-1", isOpen && "rotate-90")}>
             &rsaquo;
           </span>
         </span>
@@ -137,31 +119,37 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
           <ScoreRow 
             label="Complexity" 
             value={scores.complexity}
-            rationale="Project scope should be feasible within the 6-week timeframe."
+            rationale="Multi-step reasoning significantly increases build complexity and timeline."
           />
           <ScoreRow 
             label="MOAT" 
             value={scores.moat}
-            rationale="Competitive advantage and unique value proposition must be clear."
+            rationale="A defensible market advantage prevents commoditization and ensures business viability."
           />
 
           {/* Build Risk */}
-          <div className="mt-4 pt-4 border-t border-[var(--border)]">
-            <div className="text-xs font-bold text-[var(--text-secondary)] mb-2 tracking-wide">6-WEEK BUILD RISK</div>
-            <div 
-              className="text-center py-3 px-2.5 rounded border"
-              style={{
-                background: overallStyle.bg,
-                color: overallStyle.color,
-                border: `1px solid ${overallStyle.border}`
-              }}
-            >
-              <div className="text-sm font-bold uppercase">{scores.buildRisk || '—'}</div>
+          <div className="mt-5 pt-3 border-t border-[var(--border)]">
+            <div className="mb-3">
+              <div className="text-[11px] font-bold uppercase tracking-wide text-[var(--muted)] mb-2">6-WEEK BUILD RISK</div>
+              <div 
+                className="rounded-lg p-3 text-center"
+                style={{ 
+                  background: overallStyle.bg,
+                  border: `1px solid ${overallStyle.border}`
+                }}
+              >
+                <div 
+                  className="text-xl font-bold"
+                  style={{ color: overallStyle.color }}
+                >
+                  {scores.buildRisk || '—'}
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Score Guide */}
-          <div className="text-[13px] text-[var(--muted)] leading-relaxed bg-[var(--bg)] rounded-lg p-3 mt-4">
+          <div className="text-[13px] text-[var(--muted)] leading-relaxed bg-[var(--bg)] rounded-lg p-3">
             <div className="font-semibold text-[var(--text-secondary)] mb-2.5">Score guide:</div>
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
@@ -169,7 +157,7 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
                 <span>Low = Strong</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{backgroundColor: '#eab308'}}></span>
+                <span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: '#eab308'}}></span>
                 <span>Medium = Review</span>
               </div>
               <div className="flex items-center gap-2">
@@ -185,7 +173,7 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
                   <span>Low</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{backgroundColor: '#eab308'}}></span>
+                  <span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: '#eab308'}}></span>
                   <span>Medium</span>
                 </div>
                 <div className="flex items-center gap-2">
