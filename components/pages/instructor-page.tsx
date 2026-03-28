@@ -138,9 +138,11 @@ export function InstructorPage({
 
                 {/* Actions */}
                 <div className="flex items-center justify-between flex-wrap gap-3">
-                  <span className="text-sm text-[var(--muted)]">
-                    {isApproved ? 'Your project has been approved!' : 'Waiting for instructor response...'}
-                  </span>
+                  {isApproved && (
+                    <span className="text-sm text-[var(--muted)]">
+                      Your project has been approved!
+                    </span>
+                  )}
                   {isApproved && (
                     <button
                       onClick={onGoToMvp}
