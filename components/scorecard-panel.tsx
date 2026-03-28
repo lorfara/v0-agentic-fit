@@ -20,13 +20,14 @@ function ScoreRow({ label, value, rationale }: ScoreRowProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const getBadgeStyle = (val: RiskLevel | null) => {
-    if (!val) return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)', text: '\u2014' }
+    if (!val) return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)', text: '—' }
     switch (val) {
       case 'High': return { bg: 'var(--red-bg)', color: 'var(--red)', border: 'var(--red-border)', text: 'HIGH' }
-      case 'Medium': return { bg: 'var(--yellow-bg)', color: 'var(--yellow)', border: 'var(--yellow-border)', text: 'MEDIUM' }
+      case 'Medium': return { bg: '#fef3c7', color: '#d97706', border: '#fcd34d', text: 'MEDIUM' }
       case 'Low': return { bg: 'var(--green-bg)', color: 'var(--green)', border: 'var(--green-border)', text: 'LOW' }
-      default: return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)', text: '\u2014' }
+      default: return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)', text: '—' }
     }
+  }
   }
 
   const style = getBadgeStyle(value)
@@ -86,7 +87,7 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
     if (!risk) return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)' }
     switch (risk) {
       case 'Low': return { bg: 'var(--green-bg)', color: 'var(--green)', border: 'var(--green-border)' }
-      case 'Medium': return { bg: 'var(--yellow-bg)', color: 'var(--yellow)', border: 'var(--yellow-border)' }
+      case 'Medium': return { bg: '#fef3c7', color: '#d97706', border: '#fcd34d' }
       case 'High': return { bg: 'var(--red-bg)', color: 'var(--red)', border: 'var(--red-border)' }
       default: return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)' }
     }
