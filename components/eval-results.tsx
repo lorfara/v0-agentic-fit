@@ -74,10 +74,10 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
   
   // Map API field names to component names with defaults
   const { agentic_fit, industry_concerns = [], similar_projects = [], clarifying_questions = [] } = data
-  const concerns = industry_concerns
+  const concerns = industry_concerns || []
 
-  // Determine banner color based on highest severity
-  const highestSeverity = concerns.length > 0 
+  // Determine banner color based on highest severity - safely check array
+  const highestSeverity = (concerns && concerns.length > 0) 
     ? concerns.reduce((highest, concern) => {
         const severityOrder = { 'Critical': 3, 'Significant': 2, 'Moderate': 1 }
         return (severityOrder[concern.severity as keyof typeof severityOrder] || 0) > 
@@ -95,15 +95,8 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
   
   const style = bannerStyles[highestSeverity as keyof typeof bannerStyles] || bannerStyles.Moderate
 
-  const agenticScoreMap: Record<string, { label: string; color: string }> = {
-    HIGH:   { label: 'STRONG FIT', color: '#16a34a' },
-    MEDIUM: { label: 'MEDIUM FIT', color: '#a16207' },
-    LOW:    { label: 'WEAK FIT',   color: '#dc2626' },
-  }
-  const agenticScore = agenticScoreMap[agentic_fit?.overall_score?.toUpperCase() || ''] || null
-
   const tabs = [
-    { id: 'agentic' as Tab, label: 'Agentic Fit', scoreLabel: agenticScore?.label, scoreColor: agenticScore?.color },
+    { id: 'agentic' as Tab, label: 'Agentic Fit' },
     { id: 'concerns' as Tab, label: 'Concerns', count: concerns.length },
     { id: 'similar' as Tab, label: 'Similar Projects', count: similar_projects.length },
     { id: 'questions' as Tab, label: 'Questions', count: clarifying_questions.length }
@@ -126,15 +119,10 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
             onClick={() => setActiveTab(tab.id)}
             className={cn(
               'px-6 py-3 font-semibold text-sm transition-colors relative',
-              activeTab === tab.id ? 'text-[var(--orange)] border-b-2 border-[var(--orange)]' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
+              activeTab === tab.id ? 'text-[var(--text)] border-b-2 border-[var(--orange)]' : 'text-[var(--text-secondary)] hover:text-[var(--text)]'
             )}
           >
             {tab.label}
-            {'scoreLabel' in tab && tab.scoreLabel && (
-              <span className="ml-1.5 font-bold text-xs" style={{ color: tab.scoreColor }}>
-                — {tab.scoreLabel}
-              </span>
-            )}
             {tab.count !== undefined && (
               <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-[var(--orange)] text-white text-xs font-bold">{tab.count}</span>
             )}

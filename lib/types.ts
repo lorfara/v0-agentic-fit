@@ -4,14 +4,14 @@ export type Role = 'student' | 'instructor'
 export type RiskLevel = 'Low' | 'Medium' | 'High'
 export type Severity = 'Critical' | 'Significant' | 'Moderate'
 
-// Scores type
+// Scores type - null means roadmap feature (show dash state)
 export interface Scores {
-  agenticFit: RiskLevel
-  persona: RiskLevel
-  painPoint: RiskLevel
-  complexity: RiskLevel
-  moat: RiskLevel
-  buildRisk: RiskLevel
+  agenticFit: RiskLevel | null
+  persona: RiskLevel | null
+  painPoint: RiskLevel | null
+  complexity: RiskLevel | null
+  moat: RiskLevel | null
+  buildRisk: RiskLevel | null
 }
 
 // Agentic Fit types

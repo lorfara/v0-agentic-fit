@@ -125,27 +125,15 @@ export default function Home() {
     { id: 'buildplan', label: 'Build Plan', badge: 5, locked: !mvpDefined, done: false },
   ]
 
-  // Calculate scores based on mock evaluation response (matching the screenshots)
-  const calculateScores = (_data: ProjectFormData, round: number): Scores => {
-    // Round 1: Initial evaluation matching MEDIUM overall score from mock response
-    if (round === 1) {
-      return {
-        agenticFit: 'Medium',
-        persona: 'Low',
-        painPoint: 'Low',
-        complexity: 'Medium',
-        moat: 'Low',
-        buildRisk: 'High'
-      }
-    }
-    // Round 2+: Improved scores after coaching
+  // Scores are derived from real API response only — no mock values
+  const calculateScores = (_data: ProjectFormData, _round: number): Scores => {
     return {
-      agenticFit: 'Low',
-      persona: 'Low',
-      painPoint: 'Low',
-      complexity: 'Low',
-      moat: 'Low',
-      buildRisk: 'Low'
+      agenticFit: null,
+      persona: null,
+      painPoint: null,
+      complexity: null,
+      moat: null,
+      buildRisk: null,
     }
   }
 
@@ -164,7 +152,8 @@ export default function Home() {
     setApiError(null)
     
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || '', {
+      const webhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'https://loreleifara.app.n8n.cloud/webhook/31cf455f-5074-4b84-ad91-a8571323154d'
+      const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -213,6 +202,7 @@ export default function Home() {
         }
         
         // Derive scores from the evaluation data for the scorecard
+        // Only populate Agentic Fit from API - other fields are roadmap features
         const mapOverallScoreToRisk = (score: string): 'Low' | 'Medium' | 'High' => {
           if (score === 'HIGH') return 'Low'  // HIGH agentic fit = LOW risk
           if (score === 'MEDIUM') return 'Medium'
@@ -221,11 +211,12 @@ export default function Home() {
         
         const derivedScores: Scores = {
           agenticFit: mapOverallScoreToRisk(evaluationData.agentic_fit?.overall_score || 'LOW'),
-          persona: 'Medium',  // Default until API provides these
-          painPoint: 'Medium',
-          complexity: 'Medium',
-          moat: 'Medium',
-          buildRisk: mapOverallScoreToRisk(evaluationData.agentic_fit?.overall_score || 'LOW'),
+          // These fields are roadmap features - leave as null/undefined to show dash state
+          persona: null as unknown as 'Low' | 'Medium' | 'High',
+          painPoint: null as unknown as 'Low' | 'Medium' | 'High',
+          complexity: null as unknown as 'Low' | 'Medium' | 'High',
+          moat: null as unknown as 'Low' | 'Medium' | 'High',
+          buildRisk: null as unknown as 'Low' | 'Medium' | 'High',
         }
         setScores(derivedScores)
         
