@@ -30,7 +30,7 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
   const [activeTab, setActiveTab] = useState<Tab>('agentic')
   
   // Safety check: if data is invalid or missing critical fields, render error
-  if (!data || !data.agentic_fit || !Array.isArray(data.concerns)) {
+  if (!data || !data.agentic_fit || !Array.isArray(data.industry_concerns)) {
     return (
       <div className="bg-white rounded-lg border border-[var(--border)] overflow-hidden p-6">
         <div className="text-center">
@@ -42,7 +42,8 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
     )
   }
   
-  const { agentic_fit, concerns, similar_projects, clarifying_questions } = data
+  // Map API field names to component names
+  const { agentic_fit, industry_concerns: concerns, similar_projects = [], clarifying_questions } = data
 
   // Determine banner color based on highest severity
   const highestSeverity = concerns.length > 0 

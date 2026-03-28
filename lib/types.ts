@@ -51,12 +51,12 @@ export interface ClarifyingQuestion {
   answer?: string
 }
 
-// Full evaluation response
+// Full evaluation response (matches n8n API response)
 export interface EvaluationResponse {
   agentic_fit: AgenticFit
-  concerns: Concern[]
+  industry_concerns: Concern[]  // API returns "industry_concerns", not "concerns"
   clarifying_questions: ClarifyingQuestion[]
-  similar_projects: SimilarProject[]
+  similar_projects?: SimilarProject[]  // May not always be returned
 }
 
 // Project form data
