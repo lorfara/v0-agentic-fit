@@ -212,6 +212,23 @@ export default function Home() {
           throw new Error((evaluationData as { error: string }).error)
         }
         
+        // Derive scores from the evaluation data for the scorecard
+        const mapOverallScoreToRisk = (score: string): 'Low' | 'Medium' | 'High' => {
+          if (score === 'HIGH') return 'Low'  // HIGH agentic fit = LOW risk
+          if (score === 'MEDIUM') return 'Medium'
+          return 'High'  // LOW agentic fit = HIGH risk
+        }
+        
+        const derivedScores: Scores = {
+          agenticFit: mapOverallScoreToRisk(evaluationData.agentic_fit?.overall_score || 'LOW'),
+          persona: 'Medium',  // Default until API provides these
+          painPoint: 'Medium',
+          complexity: 'Medium',
+          moat: 'Medium',
+          buildRisk: mapOverallScoreToRisk(evaluationData.agentic_fit?.overall_score || 'LOW'),
+        }
+        setScores(derivedScores)
+        
         // Set the evaluation response from the actual API
         setEvaluationResponse(evaluationData)
         setEvaluated(true)

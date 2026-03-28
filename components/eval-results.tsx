@@ -30,7 +30,7 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
   const [activeTab, setActiveTab] = useState<Tab>('agentic')
   
   // Safety check: if data is invalid or missing critical fields, render error
-  if (!data || !data.agentic_fit || !Array.isArray(data.concerns)) {
+  if (!data || !data.agentic_fit || !Array.isArray(data.industry_concerns)) {
     return (
       <div className="bg-white rounded-lg border border-[var(--border)] overflow-hidden p-6">
         <div className="text-center">
@@ -42,7 +42,8 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
     )
   }
   
-  const { agentic_fit, concerns, similar_projects, clarifying_questions } = data
+  // Map API field names to component names
+  const { agentic_fit, industry_concerns: concerns, similar_projects = [], clarifying_questions } = data
 
   // Determine banner color based on highest severity
   const highestSeverity = concerns.length > 0 
@@ -163,13 +164,19 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
 
         {activeTab === 'similar' && (
           <div className="space-y-3">
-            {similar_projects.map((project) => (
-              <div key={project.title} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
-                <div className="font-bold text-[var(--text)] mb-1">{project.title}</div>
-                <div className="text-sm text-[var(--muted)] mb-2">{project.industry}</div>
-                <div className="text-sm text-[var(--text)]">{project.description}</div>
+            {similar_projects && similar_projects.length > 0 ? (
+              similar_projects.map((project) => (
+                <div key={project.title} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
+                  <div className="font-bold text-[var(--text)] mb-1">{project.title}</div>
+                  <div className="text-sm text-[var(--muted)] mb-2">{project.industry}</div>
+                  <div className="text-sm text-[var(--text)]">{project.description}</div>
+                </div>
+              ))
+            ) : (
+              <div className="bg-[var(--bg)] rounded-lg p-6 border-2 border-[var(--border)] text-center">
+                <div className="text-[var(--muted)] text-sm">No similar projects found for this evaluation.</div>
               </div>
-            ))}
+            )}
           </div>
         )}
 
