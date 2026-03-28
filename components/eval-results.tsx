@@ -17,7 +17,6 @@ type Tab = 'agentic' | 'concerns' | 'similar' | 'questions'
 // Reusable Ask the Coach component
 function AskTheCoach({ itemId, context }: { itemId: string; context: string }) {
   const [isOpen, setIsOpen] = useState(false)
-  const [followUp, setFollowUp] = useState('')
   
   return (
     <div className="mt-2">
@@ -30,30 +29,14 @@ function AskTheCoach({ itemId, context }: { itemId: string; context: string }) {
       </button>
       
       {isOpen && (
-        <div className="mt-3 bg-white border-2 border-[var(--border)] rounded-lg overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-[var(--border)]">
-            <span className="text-xs font-bold text-[var(--muted)] uppercase tracking-wide">AI Assistant</span>
-            <button onClick={() => setIsOpen(false)} className="text-[var(--muted)] hover:text-[var(--text)]">
+        <div className="mt-3 bg-white border-2 border-[var(--orange)] rounded-lg overflow-hidden p-4">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={() => setIsOpen(false)} className="ml-auto text-[var(--muted)] hover:text-[var(--text)]">
               <X className="w-4 h-4" />
             </button>
           </div>
-          <div className="p-4">
-            <div className="bg-gray-100 rounded-lg p-3 mb-3">
-              <p className="text-sm text-[var(--text)]">{"I'm focused on this specific point. What would you like to explore?"}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <input 
-                type="text"
-                value={followUp}
-                onChange={(e) => setFollowUp(e.target.value)}
-                placeholder="Ask a follow-up..."
-                className="flex-1 py-2 px-3 border-2 border-[var(--border)] rounded-lg text-sm outline-none focus:border-[var(--orange)]"
-              />
-              <button className="bg-[var(--orange)] text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[var(--orange-hover)] flex items-center gap-1.5">
-                Send
-                <Send className="w-3.5 h-3.5" />
-              </button>
-            </div>
+          <div className="bg-gray-100 rounded-lg p-3">
+            <p className="text-sm text-[var(--text)]">{"I'm focused on this specific point. What would you like to explore?"}</p>
           </div>
         </div>
       )}
