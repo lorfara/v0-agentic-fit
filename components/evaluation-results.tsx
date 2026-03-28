@@ -152,7 +152,7 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
                     {agentic_fit.overall_score} Overall Agentic Fit Score
                   </span>
                 </div>
-                <p className="text-sm text-[var(--text)]">{agentic_fit.summary}</p>
+                <p className="text-sm text-[var(--text)]">{agentic_fit.justification}</p>
               </div>
 
               {/* Criteria Cards */}
@@ -273,8 +273,8 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
           {activeTab === 'similar' && (
             <div className="space-y-3">
               {similar_projects.map((project) => (
-                <div key={project.name} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
-                  <div className="font-bold text-[var(--text)] mb-1">{project.name}</div>
+                <div key={project.title} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
+                  <div className="font-bold text-[var(--text)] mb-1">{project.title}</div>
                   <div className="text-sm text-[var(--muted)]">{project.description}</div>
                 </div>
               ))}
