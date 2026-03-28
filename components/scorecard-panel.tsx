@@ -19,15 +19,17 @@ interface ScoreRowProps {
 function ScoreRow({ label, value, rationale }: ScoreRowProps) {
   const [isOpen, setIsOpen] = useState(false)
 
-  const getBadgeClass = (val: RiskLevel | null) => {
-    if (!val) return "badge-empty"
+  const getBadgeStyle = (val: RiskLevel | null) => {
+    if (!val) return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)', text: '\u2014' }
     switch (val) {
-      case 'High': return "badge-high"
-      case 'Medium': return "badge-medium"
-      case 'Low': return "badge-low"
-      default: return "badge-empty"
+      case 'High': return { bg: 'var(--red-bg)', color: 'var(--red)', border: 'var(--red-border)', text: 'HIGH' }
+      case 'Medium': return { bg: 'var(--yellow-bg)', color: 'var(--yellow)', border: 'var(--yellow-border)', text: 'MEDIUM' }
+      case 'Low': return { bg: 'var(--green-bg)', color: 'var(--green)', border: 'var(--green-border)', text: 'LOW' }
+      default: return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)', text: '\u2014' }
     }
   }
+
+  const style = getBadgeStyle(value)
 
   return (
     <>
@@ -50,17 +52,28 @@ function ScoreRow({ label, value, rationale }: ScoreRowProps) {
             &rsaquo;
           </span>
         </span>
-        <span 
-          className={cn(
-            "text-xs font-bold py-1 px-3 rounded-[20px] tracking-wide uppercase border",
-            getBadgeClass(value)
-          )}
-        >
-          {value || '—'}
-        </span>
+        {value ? (
+          <span 
+            className="text-[11px] font-bold py-1 px-2.5 rounded-full tracking-wide uppercase"
+            style={{ 
+              background: style.bg, 
+              color: style.color,
+              border: `1px solid ${style.border}`
+            }}
+          >
+            {style.text}
+          </span>
+        ) : (
+          <span 
+            className="w-5 h-5 rounded-full flex items-center justify-center text-[var(--muted)]"
+            style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
+          >
+            &mdash;
+          </span>
+        )}
       </div>
       {isOpen && (
-        <div className="w-full text-xs text-[var(--muted)] leading-relaxed py-2 px-2.5 bg-[var(--bg)] rounded-md border-l-2 border-[var(--border)] mt-0.5 mb-1">
+        <div className="w-full text-xs text-[var(--muted)] leading-relaxed py-2 px-2.5 bg-[var(--bg)] rounded-md border-l-2 border-[var(--border)] mt-0.5 mb-3">
           {rationale}
         </div>
       )}
@@ -69,32 +82,24 @@ function ScoreRow({ label, value, rationale }: ScoreRowProps) {
 }
 
 export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
-  const getOverallClass = (risk: RiskLevel | null) => {
-    if (!risk) return ""
+  const getOverallStyle = (risk: RiskLevel | null) => {
+    if (!risk) return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)' }
     switch (risk) {
-      case 'Low': return "excellent"
-      case 'Medium': return "needs-work"
-      case 'High': return "not-ready"
-      default: return ""
+      case 'Low': return { bg: 'var(--green-bg)', color: 'var(--green)', border: 'var(--green-border)' }
+      case 'Medium': return { bg: 'var(--yellow-bg)', color: 'var(--yellow)', border: 'var(--yellow-border)' }
+      case 'High': return { bg: 'var(--red-bg)', color: 'var(--red)', border: 'var(--red-border)' }
+      default: return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)' }
     }
   }
 
-  const getOverallValueColor = (risk: RiskLevel | null) => {
-    if (!risk) return "var(--muted)"
-    switch (risk) {
-      case 'Low': return "var(--green)"
-      case 'Medium': return "var(--yellow)"
-      case 'High': return "var(--red)"
-      default: return "var(--muted)"
-    }
-  }
+  const overallStyle = getOverallStyle(scores?.buildRisk || null)
 
   const rationales = {
     agenticFit: "RAG retrieval + multi-step scoring + iterative coaching loop = genuine agentic pipeline. Each step feeds the next. Cannot be done in a single prompt.",
-    persona: "Bootcamp students with a 6-week build constraint and a job-search motivation. Tight and specific — every major agentic bootcamp produces this exact student.",
+    persona: "Bootcamp students with a 6-week build constraint and a job-search motivation. Tight and specific \u2014 every major agentic bootcamp produces this exact student.",
     painPoint: "Instructor feedback is slow, generic, and arrives too late. AgenticFit moves expert-level validation to week 1, when it can still change the outcome.",
     complexity: "RAG + scoring + coaching loop is buildable in 6 weeks if scope is locked to one output schema. Risk is trying to ship the build plan generator simultaneously.",
-    moat: "Thin at launch, compounding over time. Real lock-in comes from instructor adoption — once their evaluation framework is embedded, the tool becomes proprietary to their course."
+    moat: "Thin at launch, compounding over time. Real lock-in comes from instructor adoption \u2014 once their evaluation framework is embedded, the tool becomes proprietary to their course."
   }
 
   return (
@@ -120,23 +125,22 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
 
           {/* Overall Risk Box */}
           <div 
-            className={cn(
-              "text-center p-4 rounded-[10px] mb-[18px] border-2 border-[var(--border)] bg-[var(--bg)] overall-box",
-              getOverallClass(scores?.buildRisk || null)
-            )}
+            className="text-center p-4 rounded-[10px] mb-[18px]"
+            style={{ 
+              background: overallStyle.bg, 
+              border: `2px solid ${overallStyle.border}` 
+            }}
           >
-            <div className="text-xs font-bold uppercase tracking-widest text-[var(--muted)] mb-1.5">
+            <div className="text-[11px] font-bold uppercase tracking-widest text-[var(--muted)] mb-1.5">
               6-Week Build Risk
             </div>
             <div 
               className="font-display text-xl font-black"
-              style={{ color: getOverallValueColor(scores?.buildRisk || null) }}
+              style={{ color: overallStyle.color }}
             >
-              {scores?.buildRisk || '—'}
+              {scores?.buildRisk || '\u2014'}
             </div>
           </div>
-
-          <div className="h-px bg-[var(--border)] my-[18px]" />
 
           {/* Score Rows */}
           <ScoreRow 
@@ -165,14 +169,32 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
             rationale={rationales.moat}
           />
 
-          <div className="h-px bg-[var(--border)] my-[18px]" />
+          <div className="h-px bg-[var(--border)] my-4" />
 
-          {/* Hint */}
-          <div className="text-[13px] text-[var(--muted)] leading-relaxed bg-[var(--bg)] rounded-lg p-3 mt-1">
-            <strong className="text-[var(--text-secondary)]">Score guide:</strong><br />
-            <span className="text-[var(--green)]">Low</span> = Strong &nbsp;&middot;&nbsp; 
-            <span className="text-[var(--yellow)]">Medium</span> = Review &nbsp;&middot;&nbsp; 
-            <span className="text-[var(--red)]">High</span> = Address
+          {/* Score Guide */}
+          <div className="text-[13px] text-[var(--muted)] leading-relaxed bg-[var(--bg)] rounded-lg p-3">
+            <div className="font-semibold text-[var(--text-secondary)] mb-1.5">Score guide:</div>
+            <div className="flex items-center gap-1.5 flex-wrap mb-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-[var(--green)]"></span>
+              <span>Low = Strong</span>
+              <span className="text-[var(--muted)]">&middot;</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[var(--yellow)]"></span>
+              <span>Medium = Review</span>
+              <span className="text-[var(--muted)]">&middot;</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[var(--red)]"></span>
+              <span>High = Address</span>
+            </div>
+            <div className="mt-2 pt-2 border-t border-[var(--border)]">
+              <div className="font-semibold text-[var(--text-secondary)] mb-1">6-Week Build Risk:</div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--green)]"></span>
+                <span>Low</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--yellow)]"></span>
+                <span>Medium</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--red)]"></span>
+                <span>High</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

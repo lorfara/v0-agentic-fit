@@ -36,17 +36,19 @@ export function EvaluatePage({
   const showResults = !isLoading && evaluationResponse
 
   return (
-    <div className="page-inner max-w-[1280px] mx-auto py-7 px-6 pb-[60px]">
+    <div className="max-w-[1200px] mx-auto py-8 px-6 pb-16">
+      {/* Page Header */}
       <div className="mb-6">
-        <h1 className="font-display text-[26px] font-black text-[var(--text)] tracking-tight mb-1.5">
+        <h1 className="font-display text-[26px] font-black text-[var(--text)] tracking-tight mb-1">
           Project Evaluation
         </h1>
-        <p className="text-base text-[var(--muted)] leading-relaxed">
+        <p className="text-[15px] text-[var(--muted)] leading-relaxed">
           Describe your capstone idea. Answer the clarifying questions to strengthen and focus your build.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start">
         <div>
           {showForm && (
             <ProjectForm

@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { AlertTriangle, ArrowRight, MessageCircle } from "lucide-react"
-import type { EvaluationResponse, RiskLevel, ClarifyingQuestion } from "@/lib/types"
+import { AlertTriangle, ArrowRight, MessageSquare } from "lucide-react"
+import type { EvaluationResponse, RiskLevel } from "@/lib/types"
 
 interface EvaluationResultsProps {
   data: EvaluationResponse
@@ -21,9 +21,9 @@ const SEVERITY_STYLES = {
 }
 
 const VERDICT_STYLES = {
-  'Strong fit': { bg: 'var(--green-bg)', border: 'var(--green-border)', color: 'var(--green)' },
-  'Partial fit': { bg: 'var(--yellow-bg)', border: 'var(--yellow-border)', color: 'var(--yellow)' },
-  'Weak fit': { bg: 'var(--red-bg)', border: 'var(--red-border)', color: 'var(--red)' },
+  'Strong fit': { bg: 'var(--green-bg)', border: 'var(--green-border)', color: 'var(--green)', dot: 'bg-[var(--green)]' },
+  'Partial fit': { bg: 'var(--yellow-bg)', border: 'var(--yellow-border)', color: 'var(--yellow)', dot: 'bg-[var(--yellow)]' },
+  'Weak fit': { bg: 'var(--red-bg)', border: 'var(--red-border)', color: 'var(--red)', dot: 'bg-[var(--red)]' },
 }
 
 const AGENTIC_SCORE_STYLES = {
@@ -55,7 +55,7 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
       bg: 'var(--yellow-bg)',
       border: 'var(--yellow-border)',
       iconBg: 'var(--yellow)',
-      title: 'Moderate 6-week build risk — a few things need sharpening before you commit.',
+      title: 'Moderate 6-week build risk \u2014 a few things need sharpening before you commit.',
       body: 'Review the concerns below and answer the clarifying questions to lock in your scope.'
     },
     Low: {
@@ -63,7 +63,7 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
       border: 'var(--green-border)',
       iconBg: 'var(--green)',
       title: 'This project looks feasible for a 6-week build.',
-      body: 'A few things can still make your demo stronger — review the notes below.'
+      body: 'A few things can still make your demo stronger \u2014 review the notes below.'
     }
   }[buildRisk]
 
@@ -78,10 +78,10 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
 
   return (
     <div className="bg-[var(--card)] rounded-[var(--radius)] overflow-hidden mb-5" style={{ boxShadow: 'var(--shadow)' }}>
-      <div className="p-6 pt-0">
+      <div className="p-6">
         {/* Risk Alert Banner */}
         <div 
-          className="rounded-[10px] p-[18px_20px] mt-6 mb-5 flex items-start gap-3.5"
+          className="rounded-[10px] p-[18px_20px] mb-5 flex items-start gap-3.5"
           style={{ 
             background: riskConfig.bg, 
             border: `2px solid ${riskConfig.border}` 
@@ -113,7 +113,7 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "flex-1 flex items-center justify-center py-3 px-4 font-display text-sm font-bold border-b-[3px] border-transparent cursor-pointer transition-all whitespace-nowrap -mb-0.5",
+                "flex items-center justify-center py-3 px-5 font-sans text-sm font-semibold border-b-[3px] border-transparent cursor-pointer transition-all whitespace-nowrap -mb-0.5",
                 activeTab === tab.id 
                   ? "text-[var(--orange)] border-b-[var(--orange)]" 
                   : "text-[var(--muted)] hover:text-[var(--text)]"
@@ -122,7 +122,7 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
               {tab.label}
               {tab.count !== undefined && (
                 <span 
-                  className="ml-1.5 text-[11px] font-bold text-white py-0.5 px-[7px] rounded-[10px]"
+                  className="ml-2 text-[11px] font-bold text-white py-0.5 px-[7px] rounded-full min-w-[20px] text-center"
                   style={{ background: tab.countBg }}
                 >
                   {tab.count}
@@ -135,9 +135,9 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
         {/* Tab Content */}
         {activeTab === 'agentic' && (
           <div>
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3 mb-4">
               <span 
-                className="text-xs font-bold py-1 px-3.5 rounded-[20px] uppercase tracking-wider"
+                className="text-xs font-bold py-1 px-3.5 rounded-full uppercase tracking-wider"
                 style={{
                   background: agenticStyle.bg,
                   color: agenticStyle.color,
@@ -150,38 +150,47 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
             </div>
             
             <div 
-              className="text-[15px] text-[var(--text)] leading-relaxed mb-4 p-[14px_18px] bg-[var(--bg)] rounded-lg"
-              style={{ borderLeft: '3px solid var(--orange)' }}
+              className="text-[15px] text-[var(--text)] leading-relaxed mb-5 p-[14px_18px] bg-[var(--bg)] rounded-lg"
+              style={{ borderLeft: '3px solid var(--blue)' }}
             >
               {agentic_fit.justification}
             </div>
 
-            {/* Criteria */}
-            <div className="space-y-2">
+            {/* Criteria Cards */}
+            <div className="space-y-3">
               {agentic_fit.criteria.map((criterion, index) => {
                 const style = VERDICT_STYLES[criterion.verdict] || VERDICT_STYLES['Partial fit']
                 return (
                   <div 
                     key={index}
-                    className="rounded-lg p-[14px_16px]"
+                    className="rounded-lg p-4"
                     style={{ 
                       background: style.bg, 
-                      border: `1.5px solid ${style.border}`,
                       borderLeft: `4px solid ${style.color}`
                     }}
                   >
-                    <div className="flex items-center justify-between mb-1.5">
-                      <div className="text-sm font-bold text-[var(--text)]">{criterion.name}</div>
-                      <span 
-                        className="text-xs font-semibold"
-                        style={{ color: style.color }}
-                      >
-                        {criterion.verdict}
-                      </span>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-[15px] font-bold text-[var(--text)]">{criterion.name}</div>
+                      <div className="flex items-center gap-1.5">
+                        <span 
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ background: style.color }}
+                        ></span>
+                        <span 
+                          className="text-sm font-semibold"
+                          style={{ color: style.color }}
+                        >
+                          {criterion.verdict}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-[13px] text-[var(--muted)] leading-relaxed">
+                    <div className="text-[13px] text-[var(--text-secondary)] leading-relaxed mb-2">
                       {criterion.reasoning}
                     </div>
+                    <button className="text-[13px] font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] flex items-center gap-1.5">
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      Ask AI about this
+                    </button>
                   </div>
                 )
               })}
@@ -190,7 +199,7 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
             <div className="text-center mt-6">
               <button
                 onClick={() => setActiveTab('concerns')}
-                className="inline-flex items-center justify-center gap-2 py-2.5 px-[18px] rounded-[var(--radius-sm)] font-display text-sm font-extrabold cursor-pointer border-2 transition-all leading-none whitespace-nowrap bg-[var(--orange)] text-white border-[var(--orange)] hover:bg-[var(--orange-hover)] hover:border-[var(--orange-hover)]"
+                className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-full font-display text-sm font-extrabold cursor-pointer transition-all leading-none whitespace-nowrap bg-[var(--orange)] text-white hover:bg-[var(--orange-hover)]"
               >
                 Next: View Concerns
                 <ArrowRight className="w-4 h-4" />
@@ -253,7 +262,7 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
             <div className="text-center mt-6">
               <button
                 onClick={() => setActiveTab('similar')}
-                className="inline-flex items-center justify-center gap-2 py-2.5 px-[18px] rounded-[var(--radius-sm)] font-display text-sm font-extrabold cursor-pointer border-2 transition-all leading-none whitespace-nowrap bg-[var(--orange)] text-white border-[var(--orange)] hover:bg-[var(--orange-hover)] hover:border-[var(--orange-hover)]"
+                className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-full font-display text-sm font-extrabold cursor-pointer transition-all leading-none whitespace-nowrap bg-[var(--orange)] text-white hover:bg-[var(--orange-hover)]"
               >
                 Next: Similar Projects
                 <ArrowRight className="w-4 h-4" />
@@ -283,7 +292,7 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
                         {project.title}
                       </span>
                     </div>
-                    <span className="text-xs font-semibold py-0.5 px-2.5 rounded-[20px] bg-[var(--orange-light)] text-[var(--orange-hover)] border border-[#ffc49a] whitespace-nowrap">
+                    <span className="text-xs font-semibold py-0.5 px-2.5 rounded-full bg-[var(--orange-light)] text-[var(--orange-hover)] border border-[#ffc49a] whitespace-nowrap">
                       {project.industry}
                     </span>
                   </div>
@@ -297,7 +306,7 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
             <div className="text-center mt-6">
               <button
                 onClick={() => setActiveTab('questions')}
-                className="inline-flex items-center justify-center gap-2 py-2.5 px-[18px] rounded-[var(--radius-sm)] font-display text-sm font-extrabold cursor-pointer border-2 transition-all leading-none whitespace-nowrap bg-[var(--orange)] text-white border-[var(--orange)] hover:bg-[var(--orange-hover)] hover:border-[var(--orange-hover)]"
+                className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-full font-display text-sm font-extrabold cursor-pointer transition-all leading-none whitespace-nowrap bg-[var(--orange)] text-white hover:bg-[var(--orange-hover)]"
               >
                 Next: Answer Questions
                 <ArrowRight className="w-4 h-4" />
@@ -309,7 +318,7 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
         {activeTab === 'questions' && (
           <div>
             <div className="text-sm text-[var(--muted)] mb-4">
-              Answer these to strengthen your build — your responses feed into the coaching round
+              Answer these to strengthen your build \u2014 your responses feed into the coaching round
             </div>
 
             <div className="space-y-4">
@@ -344,7 +353,7 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
             <div className="text-center mt-6">
               <button
                 onClick={onGoToCoach}
-                className="inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-[var(--radius-sm)] font-display text-base font-extrabold cursor-pointer border-2 transition-all leading-none whitespace-nowrap bg-[var(--orange)] text-white border-[var(--orange)] hover:bg-[var(--orange-hover)] hover:border-[var(--orange-hover)] hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-full font-display text-base font-extrabold cursor-pointer transition-all leading-none whitespace-nowrap bg-[var(--orange)] text-white hover:bg-[var(--orange-hover)] hover:-translate-y-0.5"
                 style={{ boxShadow: '0 4px 14px rgba(232,93,0,0.35)' }}
               >
                 Strengthen Your Build

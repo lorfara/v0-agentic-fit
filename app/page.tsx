@@ -123,34 +123,28 @@ export default function Home() {
     { id: 'buildplan', label: 'Build Plan', badge: 5, locked: !mvpDefined, done: false },
   ]
 
-  // Calculate scores from form data
-  const calculateScores = (data: ProjectFormData, round: number): Scores => {
-    const hasAgentic = (data.agentic || '').length > 15
-    const hasMoat = (data.moat || '').length > 10
-    const hasWhat = (data.what || '').length > 20
-    const hasPersona = (data.persona || '').length > 5
-
-    let agenticFit: RiskLevel = hasAgentic ? 'Low' : 'High'
-    let persona: RiskLevel = hasPersona ? 'Low' : 'High'
-    let painPoint: RiskLevel = hasWhat ? 'Low' : 'High'
-    let complexity: RiskLevel = hasAgentic && (data.agentic || '').split(' ').length > 8 ? 'Medium' : 'High'
-    let moat: RiskLevel = hasMoat ? 'Low' : 'High'
-
-    if (round >= 2) {
-      agenticFit = 'Low'
-      persona = 'Low'
-      painPoint = 'Low'
-      complexity = 'Medium'
-      moat = 'Low'
+  // Calculate scores based on mock evaluation response (matching the screenshots)
+  const calculateScores = (_data: ProjectFormData, round: number): Scores => {
+    // Round 1: Initial evaluation matching MEDIUM overall score from mock response
+    if (round === 1) {
+      return {
+        agenticFit: 'Medium',
+        persona: 'Low',
+        painPoint: 'Low',
+        complexity: 'Medium',
+        moat: 'Low',
+        buildRisk: 'High'
+      }
     }
-    if (round >= 3) {
-      complexity = 'Low'
+    // Round 2+: Improved scores after coaching
+    return {
+      agenticFit: 'Low',
+      persona: 'Low',
+      painPoint: 'Low',
+      complexity: 'Low',
+      moat: 'Low',
+      buildRisk: 'Low'
     }
-
-    const highCount = [agenticFit, persona, painPoint, complexity, moat].filter(v => v === 'High').length
-    const buildRisk: RiskLevel = highCount >= 3 ? 'High' : highCount >= 1 ? 'Medium' : 'Low'
-
-    return { agenticFit, persona, painPoint, complexity, moat, buildRisk }
   }
 
   // Handlers
