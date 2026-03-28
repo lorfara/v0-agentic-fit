@@ -112,8 +112,15 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
   
   const style = bannerStyles[highestSeverity as keyof typeof bannerStyles] || bannerStyles.Moderate
 
+  const agenticScoreMap: Record<string, { label: string; color: string }> = {
+    HIGH:   { label: 'STRONG FIT', color: '#16a34a' },
+    MEDIUM: { label: 'MEDIUM FIT', color: '#a16207' },
+    LOW:    { label: 'WEAK FIT',   color: '#dc2626' },
+  }
+  const agenticScore = agenticScoreMap[agentic_fit?.overall_score?.toUpperCase() || ''] || null
+
   const tabs = [
-    { id: 'agentic' as Tab, label: 'Agentic Fit' },
+    { id: 'agentic' as Tab, label: 'Agentic Fit', scoreLabel: agenticScore?.label, scoreColor: agenticScore?.color },
     { id: 'concerns' as Tab, label: 'Concerns', count: concerns.length },
     { id: 'similar' as Tab, label: 'Similar Projects', count: similar_projects.length },
     { id: 'questions' as Tab, label: 'Questions', count: clarifying_questions.length }
@@ -140,6 +147,11 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
             )}
           >
             {tab.label}
+            {'scoreLabel' in tab && tab.scoreLabel && (
+              <span className="ml-1.5 font-bold text-xs" style={{ color: tab.scoreColor }}>
+                — {tab.scoreLabel}
+              </span>
+            )}
             {tab.count !== undefined && (
               <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-[var(--orange)] text-white text-xs font-bold">{tab.count}</span>
             )}
@@ -151,7 +163,12 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
         {activeTab === 'agentic' && (
           <div className="space-y-4">
             <div className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
-              <div className="text-[13px] font-bold text-[var(--muted)] mb-2 uppercase tracking-wide">{agentic_fit.overall_score}</div>
+              <div
+                className="text-[13px] font-bold mb-2 uppercase tracking-wide"
+                style={{ color: agenticScore?.color || 'var(--muted)' }}
+              >
+                {agenticScore?.label || agentic_fit.overall_score}
+              </div>
               <p className="text-sm text-[var(--text)]">{agentic_fit.justification}</p>
             </div>
             <div className="space-y-3">
