@@ -1,5 +1,4 @@
 "use client"
-// v5 — safety check line 116, agenticScore line 134, concerns default line 131
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { AlertTriangle, ArrowRight, MessageSquare, X } from "lucide-react"
@@ -194,7 +193,7 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
                     <AskTheCoach 
                       itemId={`criterion-${index}`} 
                       context={criterion.name}
-                      openingMessage={`I can help you think through the ${criterion.name} dimension of your project. What would you like to explore about this?`}
+                      openingMessage={`Let's talk about ${criterion.name.toLowerCase()} for your project. What's your biggest uncertainty here?`}
                     />
                   </div>
                 )
@@ -221,8 +220,8 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
                 (q) => q.linked_concern?.toLowerCase() === concern.label?.toLowerCase()
               )
               const openingMessage = linkedQuestion
-                ? `I can help you think through how to address ${concern.label} in your project. What's your current plan for ${linkedQuestion.question}`
-                : `I can help you think through how to address ${concern.label} in your project. What would you like to explore?`
+                ? `Let's think through the ${concern.label.toLowerCase()} risks for your project. ${linkedQuestion.question}`
+                : `Let's think through the ${concern.label.toLowerCase()} risks for your project. What aspect are you most unsure about?`
               return (
                 <div key={concern.rank} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]" style={{ borderLeftWidth: '4px', borderLeftColor: style.color }}>
                   <div className="flex items-center justify-between mb-2">
@@ -282,7 +281,7 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
                 <AskTheCoach 
                   itemId={`question-${q.question_number}`} 
                   context={q.question}
-                  openingMessage={`I can help you think through how to address ${q.linked_concern} in your project. What's your current plan for ${q.question}`}
+                  openingMessage={`Let's work through this together. ${q.question}`}
                 />
               </div>
             ))}
