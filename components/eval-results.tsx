@@ -1,4 +1,5 @@
-"use client"
+""use client"
+// Cache invalidation: fixes stale bundle crashes"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { AlertTriangle, ArrowRight, MessageSquare, X } from "lucide-react"

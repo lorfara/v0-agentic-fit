@@ -201,7 +201,7 @@ export function CoachPage({
                     onClick={onSkipToInstructor}
                     className="inline-flex items-center justify-center gap-2 py-2.5 px-[18px] rounded-[var(--radius-sm)] font-display text-sm font-extrabold cursor-pointer border-2 transition-all leading-none whitespace-nowrap bg-white text-[var(--text)] border-[var(--border)] hover:bg-[var(--bg)] hover:border-[#9ca3af]"
                   >
-                    Skip to Instructor
+                    Submit to Instructor
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
