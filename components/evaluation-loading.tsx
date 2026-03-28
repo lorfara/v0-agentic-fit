@@ -13,7 +13,6 @@ const LOAD_STEPS = [
   'Assessing Agentic AI fit across 4 criteria',
   'Identifying top concerns from instructor feedback patterns',
   'Generating clarifying questions linked to each concern',
-  'Scoring 6-week build risk',
 ]
 
 type StepState = 'pending' | 'active' | 'done'
