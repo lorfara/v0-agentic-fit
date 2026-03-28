@@ -61,7 +61,7 @@ function AskTheCoach({ itemId, context, openingMessage }: { itemId: string; cont
           {/* Chat messages area */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[180px]">
             {messages.map((msg, idx) => (
-              <div key={idx} className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}>
+              <div key={`${msg.role}-${idx}`} className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}>
                 <div 
                   className={cn(
                     "rounded-lg px-3 py-2 text-sm",
@@ -248,8 +248,12 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
             {similar_projects && similar_projects.length > 0 ? (
               similar_projects.map((project) => (
                 <div key={project.project_name} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
-                  <div className="font-bold text-[var(--text)] mb-0.5">{project.project_name}</div>
-                  <div className="text-[13px] text-[var(--muted)] italic mb-2">{project.student_name}</div>
+                  <div className="font-bold text-[var(--text)] mb-1.5">{project.project_name}</div>
+                  {project.industry && (
+                    <span className="inline-block text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded bg-[var(--border)] text-[var(--muted)] mb-2">
+                      {project.industry}
+                    </span>
+                  )}
                   <div className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{project.similarity_reason}</div>
                 </div>
               ))
