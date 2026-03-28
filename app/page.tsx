@@ -11,6 +11,7 @@ import { OutputSection } from "@/components/output-section"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle, ArrowRight, ArrowLeft, FileDown, Sparkles, Info } from "lucide-react"
+import { AnalysisResult, type AnalysisData } from "@/components/analysis-result"
 
 const questions = [
   {
@@ -79,7 +80,7 @@ export default function Home() {
   const [answers, setAnswers] = useState(["", "", ""])
   const [ideaError, setIdeaError] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysisResult, setAnalysisResult] = useState<unknown>(null)
+  const [analysisResult, setAnalysisResult] = useState<AnalysisData | null>(null)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
 
   const currentStep = progressMap[currentPanel] || currentPanel
@@ -118,13 +119,14 @@ export default function Home() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ projectDescription: idea }),
         })
-        
-        if (!response.ok) {
-          throw new Error("Failed to analyze idea")
-        }
-        
+
         const data = await response.json()
-        setAnalysisResult(data)
+
+        if (!response.ok || data?.error) {
+          throw new Error(data?.error || "Failed to analyze idea")
+        }
+
+        setAnalysisResult(data as AnalysisData)
       } catch (error) {
         console.error("Failed to send to webhook:", error)
         setAnalysisError("Failed to analyze your idea. Please try again.")
@@ -235,18 +237,7 @@ export default function Home() {
             )}
 
             {analysisResult && !analysisError && (
-              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-5 shadow-sm mb-5">
-                <label className="text-sm font-semibold text-[#161616] mb-3 block">
-                  Analysis Result
-                </label>
-                <div className="bg-[#f5f5f5] rounded-xl p-4 text-sm text-[#4a4a4a] leading-relaxed overflow-auto max-h-[300px]">
-                  <pre className="whitespace-pre-wrap font-mono text-xs">
-                    {typeof analysisResult === 'string' 
-                      ? analysisResult 
-                      : JSON.stringify(analysisResult, null, 2)}
-                  </pre>
-                </div>
-              </div>
+              <AnalysisResult data={analysisResult} />
             )}
 
             <div className="bg-[#E3F5ED] border border-[#00875A]/20 rounded-2xl p-4 flex items-start gap-3 mb-5">

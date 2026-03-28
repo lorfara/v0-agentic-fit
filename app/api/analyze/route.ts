@@ -12,16 +12,24 @@ export async function POST(request: Request) {
       body: JSON.stringify(body),
     })
 
-    const data = await response.json()
+    const text = await response.text()
+
+    let data: unknown
+    try {
+      data = JSON.parse(text)
+    } catch {
+      // n8n webhook-test returns plain text when not active
+      data = { error: text || "Webhook returned an empty response" }
+    }
 
     return new Response(JSON.stringify(data), {
-      status: 200,
+      status: response.ok ? 200 : response.status,
       headers: { "Content-Type": "application/json" },
     })
   } catch (error) {
     console.error("Webhook error:", error)
     return new Response(
-      JSON.stringify({ error: "Failed to analyze idea" }),
+      JSON.stringify({ error: "Could not reach the analysis service. Please try again." }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     )
   }
