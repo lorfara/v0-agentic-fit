@@ -28,6 +28,20 @@ const SEVERITY_STYLES: Record<string, { bg: string; color: string; border: strin
 
 export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange }: EvalResultsProps) {
   const [activeTab, setActiveTab] = useState<Tab>('agentic')
+  
+  // Safety check: if data is invalid or missing critical fields, render error
+  if (!data || !data.agentic_fit || !Array.isArray(data.concerns)) {
+    return (
+      <div className="bg-white rounded-lg border border-[var(--border)] overflow-hidden p-6">
+        <div className="text-center">
+          <AlertTriangle className="w-8 h-8 text-red-600 mx-auto mb-2" />
+          <p className="text-red-600 font-bold">Invalid response data</p>
+          <p className="text-sm text-gray-600 mt-1">The evaluation response was incomplete or malformed. Please try again.</p>
+        </div>
+      </div>
+    )
+  }
+  
   const { agentic_fit, concerns, similar_projects, clarifying_questions } = data
 
   // Determine banner color based on highest severity
