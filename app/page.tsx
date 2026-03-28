@@ -157,14 +157,14 @@ export default function Home() {
     }
   }
 
-  // Evaluate project via server-side API proxy (v2)
+  // Evaluate project directly via n8n webhook (CORS enabled)
   const handleEvaluate = async () => {
     setIsLoading(true)
     setRawApiResponse(null)
     setApiError(null)
     
     try {
-      const response = await fetch('/api/evaluate', {
+      const response = await fetch('https://loreleifara.app.n8n.cloud/webhook/31cf455f-5074-4b84-ad91-a8571323154d', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -192,7 +192,7 @@ export default function Home() {
         const jsonData = JSON.parse(rawText) as EvaluationResponse
         console.log('[v0] Parsed JSON:', jsonData)
         
-        // Check if response has an error property (from our API route)
+        // Check if response has an error property
         if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
           throw new Error((jsonData as { error: string }).error)
         }
