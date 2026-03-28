@@ -4,54 +4,76 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Kayak-inspired color palette - exact match */
-  --orange: #FF6B00;
-  --orange-hover: #E55D00;
-  --orange-light: #FFF0E6;
-  --black: #161616;
-  --gray-900: #1a1a1a;
-  --gray-700: #4a4a4a;
-  --gray-500: #8a8a8a;
-  --gray-300: #d1d1d1;
-  --gray-200: #e5e5e5;
-  --gray-100: #f5f5f5;
-  --gray-50: #fafafa;
-  --white: #ffffff;
-  --green: #00875A;
-  --green-light: #E3F5ED;
-  --red: #DE350B;
-  --red-light: #FFEBE6;
-  --yellow: #FF991F;
-  --yellow-light: #FFF7E6;
+  /* AgenticFit Coach Design System */
+  --orange: #FF690F;
+  --orange-hover: #e55500;
+  --orange-light: #fff4ee;
+  --orange-mid: #FF690F;
+  
+  --navy: #0a0a0a;
+  --navy-mid: #1a1a1a;
+  --navy-light: #2a2a2a;
+  
+  --bg: #f7f8fa;
+  --card: #ffffff;
+  --border: #e2e5ea;
+  --border-focus: #E85D00;
+  
+  --text: #0a0a0a;
+  --text-secondary: #374151;
+  --muted: #6b7280;
+  
+  --green: #0a7c3e;
+  --green-bg: #ecfdf5;
+  --green-border: #6ee7b7;
+  
+  --red: #b91c1c;
+  --red-bg: #fef2f2;
+  --red-border: #fca5a5;
+  
+  --yellow: #92400e;
+  --yellow-bg: #fffbeb;
+  --yellow-border: #fcd34d;
+  
+  --blue: #1d4ed8;
+  --blue-bg: #eff6ff;
+  --blue-border: #93c5fd;
 
-  --background: var(--gray-100);
-  --foreground: var(--black);
-  --card: var(--white);
-  --card-foreground: var(--black);
-  --popover: var(--white);
-  --popover-foreground: var(--black);
+  /* Semantic tokens */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card-background: var(--card);
+  --card-foreground: var(--text);
+  --popover: var(--card);
+  --popover-foreground: var(--text);
   --primary: var(--orange);
-  --primary-foreground: var(--white);
-  --secondary: var(--gray-100);
-  --secondary-foreground: var(--gray-700);
-  --muted: var(--gray-100);
-  --muted-foreground: var(--gray-500);
+  --primary-foreground: #ffffff;
+  --secondary: var(--bg);
+  --secondary-foreground: var(--text-secondary);
+  --muted-color: var(--bg);
+  --muted-foreground: var(--muted);
   --accent: var(--orange-light);
   --accent-foreground: var(--orange);
   --destructive: var(--red);
-  --destructive-foreground: var(--white);
-  --border: var(--gray-200);
-  --input: var(--gray-200);
+  --destructive-foreground: #ffffff;
+  --input: var(--border);
   --ring: var(--orange);
+  
   --radius: 12px;
+  --radius-sm: 8px;
+  
+  --shadow: 0 2px 8px rgba(0,0,0,0.10);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.14);
 }
 
 @theme inline {
-  --font-sans: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: var(--font-mono), ui-monospace, monospace;
+  --font-sans: 'Nunito Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Nunito', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, monospace;
+  
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-card: var(--card);
+  --color-card: var(--card-background);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
@@ -59,7 +81,7 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
+  --color-muted: var(--muted-color);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
@@ -68,6 +90,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -79,10 +102,14 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-[#f5f5f5] text-[#161616] antialiased;
+    @apply bg-[var(--bg)] text-[var(--text)] antialiased;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
   }
 }
 
+/* Animation Keyframes */
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -94,38 +121,118 @@
   }
 }
 
-@keyframes pulse-dot {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(0.85);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
+@keyframes spin {
   to { transform: rotate(360deg); }
 }
 
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Animation Classes */
 .animate-fade-up {
   animation: fadeUp 0.4s ease-out both;
 }
 
-.animate-pulse-dot {
-  animation: pulse-dot 1.4s ease-in-out infinite;
-}
-
-.animate-pulse-dot-delay-1 {
-  animation: pulse-dot 1.4s ease-in-out infinite 0.2s;
-}
-
-.animate-pulse-dot-delay-2 {
-  animation: pulse-dot 1.4s ease-in-out infinite 0.4s;
-}
-
 .animate-spin-slow {
-  animation: spin-slow 2s linear infinite;
+  animation: spin 0.7s linear infinite;
+}
+
+/* Shimmer Loading Bar */
+.shimmer-bar {
+  height: 4px;
+  background: linear-gradient(90deg, var(--orange) 0%, #ff9a5c 50%, var(--orange) 100%);
+  background-size: 200%;
+  animation: shimmer 1.2s infinite;
+  border-radius: 4px;
+}
+
+/* Form Focus States */
+.form-input:focus,
+.form-textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(232,93,0,0.15);
+}
+
+/* Score Badges */
+.badge-high {
+  background: var(--red-bg);
+  color: var(--red);
+  border-color: var(--red-border);
+}
+
+.badge-medium {
+  background: var(--yellow-bg);
+  color: var(--yellow);
+  border-color: var(--yellow-border);
+}
+
+.badge-low {
+  background: var(--green-bg);
+  color: var(--green);
+  border-color: var(--green-border);
+}
+
+.badge-empty {
+  background: var(--bg);
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+/* Overall Box States */
+.overall-box.excellent {
+  background: var(--green-bg);
+  border-color: var(--green-border);
+}
+
+.overall-box.needs-work {
+  background: var(--yellow-bg);
+  border-color: var(--yellow-border);
+}
+
+.overall-box.not-ready {
+  background: var(--red-bg);
+  border-color: var(--red-border);
+}
+
+/* Chip Variants */
+.chip-pending {
+  background: var(--yellow-bg);
+  color: var(--yellow);
+  border-color: var(--yellow-border);
+}
+
+.chip-approved {
+  background: var(--green-bg);
+  color: var(--green);
+  border-color: var(--green-border);
+}
+
+.chip-locked {
+  background: var(--bg);
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.chip-active {
+  background: var(--orange-light);
+  color: var(--orange-hover);
+  border-color: #ffc49a;
+}
+
+/* Result Tiles */
+.result-tile.high {
+  border-color: var(--red-border);
+  background: var(--red-bg);
+}
+
+.result-tile.medium {
+  border-color: var(--yellow-border);
+  background: var(--yellow-bg);
+}
+
+.result-tile.low {
+  border-color: var(--green-border);
+  background: var(--green-bg);
 }
