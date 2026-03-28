@@ -30,11 +30,11 @@ const SCORE_ROWS = [
 
 export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
   return (
-    <aside className="sticky top-20 w-full bg-white rounded-xl border border-[var(--border)] overflow-hidden" style={{ boxShadow: "var(--shadow)" }}>
+    <aside className="sticky top-20 w-full bg-white border border-[var(--border)] overflow-hidden" style={{ boxShadow: "var(--shadow)" }}>
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 bg-[var(--dark)] text-white">
-        <BarChart3 size={16} className="text-[var(--orange)]" />
-        <h2 className="text-sm font-bold tracking-wide">Scorecard</h2>
+      <div className="flex items-center gap-3 px-5 py-4 bg-black text-white">
+        <BarChart3 size={20} className="text-[var(--orange)]" />
+        <h2 className="text-base font-bold">Scorecard</h2>
       </div>
 
       <div className="p-4">
