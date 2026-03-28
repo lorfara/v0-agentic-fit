@@ -164,7 +164,7 @@ export default function Home() {
     setApiError(null)
     
     try {
-      const response = await fetch('https://loreleifara.app.n8n.cloud/webhook/31cf455f-5074-4b84-ad91-a8571323154d', {
+      const response = await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || '', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
