@@ -14,9 +14,23 @@ interface EvalResultsProps {
 
 type Tab = 'agentic' | 'concerns' | 'similar' | 'questions'
 
-// Reusable Ask the Coach component
+// Reusable Ask the Coach chat interface component
 function AskTheCoach({ itemId, context }: { itemId: string; context: string }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [inputValue, setInputValue] = useState('')
+  const [messages, setMessages] = useState<Array<{ role: 'coach' | 'user'; text: string }>>([
+    { role: 'coach', text: "I'm focused on this specific point. What would you like to explore?" }
+  ])
+  
+  const handleSend = () => {
+    if (!inputValue.trim()) return
+    setMessages(prev => [...prev, { role: 'user', text: inputValue }])
+    setInputValue('')
+    // TODO: Add actual AI response logic here
+    setTimeout(() => {
+      setMessages(prev => [...prev, { role: 'coach', text: "That's a great question! Let me help you think through this..." }])
+    }, 500)
+  }
   
   return (
     <div className="mt-2">
@@ -29,14 +43,54 @@ function AskTheCoach({ itemId, context }: { itemId: string; context: string }) {
       </button>
       
       {isOpen && (
-        <div className="mt-3 bg-white border-2 border-[var(--orange)] rounded-lg overflow-hidden p-4">
-          <div className="flex items-center justify-between mb-3">
-            <button onClick={() => setIsOpen(false)} className="ml-auto text-[var(--muted)] hover:text-[var(--text)]">
+        <div className="mt-3 bg-white border-2 border-[var(--orange)] rounded-lg overflow-hidden flex flex-col min-h-[300px]">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-[var(--orange)] flex items-center justify-center">
+                <MessageSquare className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-bold text-sm text-[var(--text)]">AgenticFit Coach</span>
+            </div>
+            <button onClick={() => setIsOpen(false)} className="text-[var(--muted)] hover:text-[var(--text)] p-1">
               <X className="w-4 h-4" />
             </button>
           </div>
-          <div className="bg-gray-100 rounded-lg p-3">
-            <p className="text-sm text-[var(--text)]">{"I'm focused on this specific point. What would you like to explore?"}</p>
+          
+          {/* Chat messages area */}
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[180px]">
+            {messages.map((msg, idx) => (
+              <div key={idx} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
+                <div 
+                  className={cn(
+                    "max-w-[80%] rounded-lg px-3 py-2 text-sm",
+                    msg.role === 'coach' 
+                      ? "bg-gray-100 text-[var(--text)]" 
+                      : "bg-[var(--orange)] text-white"
+                  )}
+                >
+                  {msg.text}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Input area */}
+          <div className="border-t border-gray-200 p-3 flex items-center gap-2">
+            <input 
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              placeholder="Ask a follow-up..."
+              className="flex-1 py-2 px-3 border-2 border-gray-200 rounded-lg text-sm outline-none focus:border-[var(--orange)] transition-colors"
+            />
+            <button 
+              onClick={handleSend}
+              className="bg-[var(--orange)] text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-[var(--orange-hover)] transition-colors"
+            >
+              Send
+            </button>
           </div>
         </div>
       )}
