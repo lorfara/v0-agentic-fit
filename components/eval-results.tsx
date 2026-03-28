@@ -1,8 +1,8 @@
 "use client"
-
+// v4 — agenticScore defined, safety check in place, no stale refs
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { AlertTriangle, ArrowRight, MessageSquare, X, Send } from "lucide-react"
+import { AlertTriangle, ArrowRight, MessageSquare, X } from "lucide-react"
 import type { EvaluationResponse } from "@/lib/types"
 
 interface EvalResultsProps {
@@ -76,25 +76,6 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
   const { agentic_fit, industry_concerns = [], similar_projects = [], clarifying_questions = [] } = data
   const concerns = industry_concerns || []
 
-  // Determine banner color based on highest severity - safely check array
-  const highestSeverity = (concerns && concerns.length > 0) 
-    ? concerns.reduce((highest, concern) => {
-        const severityOrder = { 'Critical': 3, 'Significant': 2, 'Moderate': 1 }
-        return (severityOrder[concern.severity as keyof typeof severityOrder] || 0) > 
-               (severityOrder[highest.severity as keyof typeof severityOrder] || 0) 
-          ? concern 
-          : highest
-      }).severity
-    : 'Moderate'
-
-  const bannerStyles = {
-    'Critical': { bg: '#fee2e2', border: '#fca5a5', textBold: '#991b1b', textLight: '#7f1d1d' },
-    'Significant': { bg: '#fef3c7', border: '#fcd34d', textBold: '#92400e', textLight: '#78350f' },
-    'Moderate': { bg: '#d1fae5', border: '#6ee7b7', textBold: '#065f46', textLight: '#047857' }
-  }
-  
-  const style = bannerStyles[highestSeverity as keyof typeof bannerStyles] || bannerStyles.Moderate
-
   // Map overall score to display label and color for the agentic fit content area
   const agenticScoreMap: Record<string, { label: string; color: string }> = {
     HIGH:   { label: 'STRONG FIT', color: '#16a34a' },
@@ -112,14 +93,6 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
 
   return (
     <div className="bg-white rounded-lg border border-[var(--border)] overflow-hidden" style={{ boxShadow: 'var(--shadow)' }}>
-      <div className="border-b-2 px-6 py-4 flex items-start gap-3" style={{ background: style.bg, borderColor: style.border }}>
-        <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: bannerStyles[highestSeverity as keyof typeof bannerStyles]?.border }} />
-        <div>
-          <div className="font-bold mb-1" style={{ color: style.textBold }}>High risk of not completing this project as described in 6 weeks.</div>
-          <div className="text-sm" style={{ color: style.textLight }}>Review the agentic fit assessment and concerns below. Answer the clarifying questions before strengthening your build.</div>
-        </div>
-      </div>
-
       <div className="border-b border-[var(--border)] flex">
         {tabs.map((tab) => (
           <button
