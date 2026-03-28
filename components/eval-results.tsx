@@ -193,7 +193,7 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
                     <AskTheCoach 
                       itemId={`criterion-${index}`} 
                       context={criterion.name}
-                      openingMessage={`Let's talk about ${criterion.name.toLowerCase()} for your project. What's your biggest uncertainty here?`}
+                      openingMessage={`I can help you think through ${criterion.name?.replace(/[?!.,;:]+$/, '') || criterion.name}. How can I help?`}
                     />
                   </div>
                 )
@@ -219,9 +219,8 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
               const linkedQuestion = clarifying_questions.find(
                 (q) => q.linked_concern?.toLowerCase() === concern.label?.toLowerCase()
               )
-              const openingMessage = linkedQuestion
-                ? `Let's think through the ${concern.label.toLowerCase()} risks for your project. ${linkedQuestion.question}`
-                : `Let's think through the ${concern.label.toLowerCase()} risks for your project. What aspect are you most unsure about?`
+              const cleanLabel = concern.label?.replace(/[?!.,;:]+$/, '') || ''
+              const openingMessage = `I can help you think through ${cleanLabel}. How can I help?`
               return (
                 <div key={concern.rank} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]" style={{ borderLeftWidth: '4px', borderLeftColor: style.color }}>
                   <div className="flex items-center justify-between mb-2">
@@ -281,7 +280,7 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
                 <AskTheCoach 
                   itemId={`question-${q.question_number}`} 
                   context={q.question}
-                  openingMessage={`Let's work through this together. ${q.question}`}
+                  openingMessage={`I can help you think through ${(q.linked_concern || q.question)?.replace(/[?!.,;:]+$/, '')}. How can I help?`}
                 />
               </div>
             ))}
