@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+
 import { cn } from "@/lib/utils"
 import type { Scores, RiskLevel } from "@/lib/types"
 import { BarChart3 } from "lucide-react"
@@ -27,7 +28,6 @@ function ScoreRow({ label, value, rationale }: ScoreRowProps) {
       case 'Low': return { bg: 'var(--green-bg)', color: 'var(--green)', border: 'var(--green-border)', text: 'LOW' }
       default: return { bg: 'var(--bg)', color: 'var(--muted)', border: 'var(--border)', text: '—' }
     }
-  }
   }
 
   const style = getBadgeStyle(value)
