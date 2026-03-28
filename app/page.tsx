@@ -125,27 +125,15 @@ export default function Home() {
     { id: 'buildplan', label: 'Build Plan', badge: 5, locked: !mvpDefined, done: false },
   ]
 
-  // Calculate scores based on mock evaluation response (matching the screenshots)
-  const calculateScores = (_data: ProjectFormData, round: number): Scores => {
-    // Round 1: Initial evaluation matching MEDIUM overall score from mock response
-    if (round === 1) {
-      return {
-        agenticFit: 'Medium',
-        persona: 'Low',
-        painPoint: 'Low',
-        complexity: 'Medium',
-        moat: 'Low',
-        buildRisk: 'High'
-      }
-    }
-    // Round 2+: Improved scores after coaching
+  // Scores are derived from real API response only — no mock values
+  const calculateScores = (_data: ProjectFormData, _round: number): Scores => {
     return {
-      agenticFit: 'Low',
-      persona: 'Low',
-      painPoint: 'Low',
-      complexity: 'Low',
-      moat: 'Low',
-      buildRisk: 'Low'
+      agenticFit: null,
+      persona: null,
+      painPoint: null,
+      complexity: null,
+      moat: null,
+      buildRisk: null,
     }
   }
 
@@ -164,7 +152,8 @@ export default function Home() {
     setApiError(null)
     
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || '', {
+      const webhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'https://loreleifara.app.n8n.cloud/webhook/31cf455f-5074-4b84-ad91-a8571323154d'
+      const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
