@@ -53,11 +53,7 @@ export function Navigation({
             <span 
               className={cn(
                 "w-5 h-5 text-[11px] font-bold rounded-full flex items-center justify-center",
-                step.done 
-                  ? "bg-[var(--green)] text-white" 
-                  : currentPage === step.id
-                    ? "bg-[var(--orange)] text-white"
-                    : "bg-white/20 text-white/80"
+                "bg-[var(--orange)] text-white"
               )}
             >
               {step.badge}
