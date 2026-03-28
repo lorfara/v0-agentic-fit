@@ -164,13 +164,19 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
 
         {activeTab === 'similar' && (
           <div className="space-y-3">
-            {similar_projects.map((project) => (
-              <div key={project.title} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
-                <div className="font-bold text-[var(--text)] mb-1">{project.title}</div>
-                <div className="text-sm text-[var(--muted)] mb-2">{project.industry}</div>
-                <div className="text-sm text-[var(--text)]">{project.description}</div>
+            {similar_projects && similar_projects.length > 0 ? (
+              similar_projects.map((project) => (
+                <div key={project.title} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
+                  <div className="font-bold text-[var(--text)] mb-1">{project.title}</div>
+                  <div className="text-sm text-[var(--muted)] mb-2">{project.industry}</div>
+                  <div className="text-sm text-[var(--text)]">{project.description}</div>
+                </div>
+              ))
+            ) : (
+              <div className="bg-[var(--bg)] rounded-lg p-6 border-2 border-[var(--border)] text-center">
+                <div className="text-[var(--muted)] text-sm">No similar projects found for this evaluation.</div>
               </div>
-            ))}
+            )}
           </div>
         )}
 
