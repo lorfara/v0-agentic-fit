@@ -212,14 +212,19 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
             {concerns.map((concern) => {
               const style = SEVERITY_STYLES[concern.severity] || SEVERITY_STYLES.Moderate
               return (
-                <div key={concern.rank} className="rounded-[10px] p-[18px_20px]" style={{ background: style.bg, border: `2px solid ${style.border}`, borderLeft: `4px solid ${style.color}` }}>
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ background: style.color }}>{concern.rank}</span>
-                    <span className="text-[15px] font-bold text-[var(--text)]">{concern.label}</span>
-                    <span className="ml-auto text-xs font-semibold py-0.5 px-2 rounded" style={{ background: style.bg, color: style.color, border: `1px solid ${style.border}` }}>{concern.severity}</span>
+                <div key={concern.rank} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]" style={{ borderLeftWidth: '4px', borderLeftColor: style.color }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <span className="w-7 h-7 rounded-full bg-[var(--blue)] text-white text-xs font-bold flex items-center justify-center">{concern.rank}</span>
+                      <span className="text-[15px] font-bold text-[var(--text)]">{concern.label}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ background: style.color }}></span>
+                      <span className="text-sm font-semibold" style={{ color: style.color }}>{concern.severity}</span>
+                    </div>
                   </div>
-                  <div className="text-sm text-[var(--muted)] mb-2 italic">Source: {concern.source}</div>
-                  <div className="text-sm text-[var(--text)] leading-relaxed">{concern.explanation}</div>
+                  <div className="text-[13px] text-[var(--muted)] mb-2 italic">Source: {concern.source}</div>
+                  <div className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{concern.explanation}</div>
                   <AskTheCoach itemId={`concern-${concern.rank}`} context={concern.label} />
                 </div>
               )
