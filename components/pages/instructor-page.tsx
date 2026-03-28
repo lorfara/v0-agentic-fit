@@ -58,11 +58,11 @@ export function InstructorPage({
         <h1 className="font-display text-[26px] font-black text-[var(--text)] tracking-tight mb-1.5">
           Instructor Review
         </h1>
-        <p className="text-base text-[var(--muted)] leading-relaxed">
-          {role === 'instructor' 
-            ? 'Review and approve student capstone submissions'
-            : 'Awaiting submission. Complete your evaluations and submit when ready.'}
-        </p>
+        {role === 'instructor' && (
+          <p className="text-base text-[var(--muted)] leading-relaxed">
+            Review and approve student capstone submissions
+          </p>
+        )}
       </div>
 
       {/* Student View */}
@@ -101,13 +101,21 @@ export function InstructorPage({
               {/* Body */}
               <div className="p-6">
                 {/* Project Name */}
-                <div className="bg-[var(--bg)] rounded-[10px] p-[18px_22px] mb-5">
-                  <div className="text-sm font-bold text-[var(--muted)] uppercase tracking-wider mb-1">
-                    Project Submitted
+                <div className="bg-[var(--bg)] rounded-[10px] p-[18px_22px] mb-5 flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-bold text-[var(--muted)] uppercase tracking-wider mb-1">
+                      Project Submitted
+                    </div>
+                    <div className="text-lg font-bold text-[var(--text)]">
+                      {projectName || '—'}
+                    </div>
                   </div>
-                  <div className="text-lg font-bold text-[var(--text)]">
-                    {projectName || '—'}
-                  </div>
+                  <button
+                    disabled
+                    className="px-4 py-2 rounded-lg border-2 border-[var(--border)] text-sm font-bold text-[var(--muted)] bg-white cursor-not-allowed opacity-50 tracking-wide"
+                  >
+                    Feedback
+                  </button>
                 </div>
 
                 {/* Instructor Feedback */}
