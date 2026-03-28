@@ -1,4 +1,4 @@
-const WEBHOOK_URL = "https://loreleifara.app.n8n.cloud/webhook-test/15167a45-4547-4f11-81e7-b8c718d2ad00"
+const WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || ""
 
 export async function POST(request: Request) {
   try {
