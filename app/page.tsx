@@ -213,6 +213,7 @@ export default function Home() {
         }
         
         // Derive scores from the evaluation data for the scorecard
+        // Only populate Agentic Fit from API - other fields are roadmap features
         const mapOverallScoreToRisk = (score: string): 'Low' | 'Medium' | 'High' => {
           if (score === 'HIGH') return 'Low'  // HIGH agentic fit = LOW risk
           if (score === 'MEDIUM') return 'Medium'
@@ -221,11 +222,12 @@ export default function Home() {
         
         const derivedScores: Scores = {
           agenticFit: mapOverallScoreToRisk(evaluationData.agentic_fit?.overall_score || 'LOW'),
-          persona: 'Medium',  // Default until API provides these
-          painPoint: 'Medium',
-          complexity: 'Medium',
-          moat: 'Medium',
-          buildRisk: mapOverallScoreToRisk(evaluationData.agentic_fit?.overall_score || 'LOW'),
+          // These fields are roadmap features - leave as null/undefined to show dash state
+          persona: null as unknown as 'Low' | 'Medium' | 'High',
+          painPoint: null as unknown as 'Low' | 'Medium' | 'High',
+          complexity: null as unknown as 'Low' | 'Medium' | 'High',
+          moat: null as unknown as 'Low' | 'Medium' | 'High',
+          buildRisk: null as unknown as 'Low' | 'Medium' | 'High',
         }
         setScores(derivedScores)
         
