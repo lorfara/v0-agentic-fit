@@ -189,24 +189,39 @@ export default function Home() {
       }
       
       try {
-        const jsonData = JSON.parse(rawText) as EvaluationResponse
-        console.log('[v0] Parsed JSON:', jsonData)
+        // n8n returns [{"output": "...json string..."}] format
+        const outerArray = JSON.parse(rawText)
+        console.log('[v0] Parsed outer array:', outerArray)
+        
+        // Get the first item and extract the output field
+        if (!Array.isArray(outerArray) || outerArray.length === 0) {
+          throw new Error('Response is not an array or is empty')
+        }
+        
+        const firstItem = outerArray[0]
+        if (!firstItem || typeof firstItem.output !== 'string') {
+          throw new Error('Response missing output field')
+        }
+        
+        // Parse the output string as JSON to get the actual evaluation data
+        const evaluationData = JSON.parse(firstItem.output) as EvaluationResponse
+        console.log('[v0] Parsed evaluation data:', evaluationData)
         
         // Check if response has an error property
-        if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
-          throw new Error((jsonData as { error: string }).error)
+        if (evaluationData && typeof evaluationData === 'object' && 'error' in evaluationData) {
+          throw new Error((evaluationData as { error: string }).error)
         }
         
         // Set the evaluation response from the actual API
-        setEvaluationResponse(jsonData)
+        setEvaluationResponse(evaluationData)
         setEvaluated(true)
         showToast('Evaluation complete — review your results below', 'success')
       } catch (parseError) {
-        console.log('[v0] Response is not valid JSON:', parseError)
+        console.log('[v0] Response parsing error:', parseError)
         console.log('[v0] Raw response was:', rawText)
         // Show the raw response so user can debug
         setRawApiResponse(rawText)
-        throw new Error(`API response was not valid JSON`)
+        throw new Error(`Failed to parse API response: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`)
       }
     } catch (error) {
       console.error('[v0] API Error:', error)
