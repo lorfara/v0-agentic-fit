@@ -95,6 +95,14 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
   
   const style = bannerStyles[highestSeverity as keyof typeof bannerStyles] || bannerStyles.Moderate
 
+  // Map overall score to display label and color for the agentic fit content area
+  const agenticScoreMap: Record<string, { label: string; color: string }> = {
+    HIGH:   { label: 'STRONG FIT', color: '#16a34a' },
+    MEDIUM: { label: 'MEDIUM FIT', color: '#a16207' },
+    LOW:    { label: 'WEAK FIT',   color: '#dc2626' },
+  }
+  const agenticScore = agenticScoreMap[agentic_fit?.overall_score?.toUpperCase() || ''] || null
+
   const tabs = [
     { id: 'agentic' as Tab, label: 'Agentic Fit' },
     { id: 'concerns' as Tab, label: 'Concerns', count: concerns.length },
