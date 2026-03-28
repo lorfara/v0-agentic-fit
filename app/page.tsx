@@ -1,321 +1,342 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Header } from "@/components/header"
-import { ProgressBar } from "@/components/progress-bar"
-import { LoadingCard } from "@/components/loading-card"
-import { QuestionCard } from "@/components/question-card"
-import { VerdictBanner } from "@/components/verdict-banner"
-import { ComparableItem } from "@/components/comparable-item"
-import { OutputSection } from "@/components/output-section"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { AlertTriangle, ArrowRight, ArrowLeft, FileDown, Sparkles, Info } from "lucide-react"
+import { useState, useCallback } from "react"
+import { Navigation } from "@/components/navigation"
+import { EvaluatePage } from "@/components/pages/evaluate-page"
+import { CoachPage } from "@/components/pages/coach-page"
+import { InstructorPage } from "@/components/pages/instructor-page"
+import { MvpPage } from "@/components/pages/mvp-page"
+import { BuildPlanPage } from "@/components/pages/buildplan-page"
+import { AppToast } from "@/components/app-toast"
+import type { Page, Role, NavStep, ProjectFormData, EvaluationResponse, Scores, RiskLevel } from "@/lib/types"
 
-const questions = [
-  {
-    question: "Which specific type of nurse, in which specific setting — ER, ICU, primary care — and what EHR system are they using today?",
-    why: "Past pattern: 2 of 3 similar ideas failed to scope the persona tightly enough, leading to scope creep in week 3.",
-    placeholder: "Be as specific as you can...",
+// Mock evaluation response
+const MOCK_EVALUATION_RESPONSE: EvaluationResponse = {
+  agentic_fit: {
+    overall_score: "MEDIUM",
+    justification: "The project has a clear agentic use case in content synthesis and structured output generation. However, the multi-source ingestion layer and persistent memory add significant architectural complexity that may be difficult to demo reliably in 6 weeks. A focused MVP on single-source ingestion would score HIGH.",
+    criteria: [
+      { name: "Multi-step reasoning", verdict: "Strong fit", reasoning: "Document ingestion -> synthesis -> structured output is a clear multi-step agentic pipeline." },
+      { name: "Tool use / external integrations", verdict: "Partial fit", reasoning: "Google Drive integration is well-defined; Notion and PDF parsing add scope risk." },
+      { name: "Persistent memory", verdict: "Weak fit", reasoning: "Career tracking memory is compelling but adds architecture complexity not needed for MVP demo." },
+      { name: "Structured output", verdict: "Strong fit", reasoning: "Editable UI output is the core differentiator and maps directly to an agentic structured output pattern." },
+    ]
   },
-  {
-    question: "How will you get access to real clinical notes or EHR data for testing during a 6-week build — without running into HIPAA constraints?",
-    why: "Past pattern: Data access was the #1 blocker for healthcare ideas in the last cohort. Having a plan here changes the feasibility score significantly.",
-    placeholder: "Synthetic data? Anonymized examples? A partner clinic?",
-  },
-  {
-    question: "Where exactly does your AI make a decision that a deterministic rule couldn't — and what happens if it gets that decision wrong?",
-    why: "This separates agentic ideas from single-prompt ones. If you can answer this clearly, your agentic signal score improves significantly.",
-    placeholder: "e.g. It decides which fields are clinically significant vs boilerplate — a rule can't do this because it varies by case type...",
-  },
-]
-
-const comparables = [
-  {
-    id: "C1",
-    name: "NurseNote AI",
-    tag: "Narrow Scope",
-    tagType: "narrow" as const,
-    outcome: "Cohort 4 · Healthcare · Complexity 5/6",
-    lesson: "Started with live EHR integration. Pivoted to synthetic data at week 2 after Epic API access took 6 weeks to approve. Shipped a working demo on synthetic data and got Strong GO on resubmission.",
-  },
-  {
-    id: "C2",
-    name: "ClinicalCopilot",
-    tag: "Do Not Build",
-    tagType: "no" as const,
-    outcome: "Cohort 3 · Healthcare · Complexity 6/6",
-    lesson: "Attempted real-time EHR writes during patient encounters. HIPAA compliance research consumed 3 of 6 weeks. Never reached a working prototype. No clear pivot path identified early enough.",
-  },
-  {
-    id: "C3",
-    name: "MedTranscribe",
-    tag: "Strong GO",
-    tagType: "go" as const,
-    outcome: "Cohort 5 · Healthcare · Complexity 3/6",
-    lesson: "Scoped to one task: extracting medication names and dosages from verbal notes. Used MIMIC-III for test data. Clear agentic loop: listen → extract → validate → flag ambiguity. Shipped in 5 weeks.",
-  },
-]
-
-const progressMap: Record<number, number> = {
-  1: 1,
-  2: 2,
-  3: 3,
-  4: 5,
-  5: 6,
-}
-
-// Maps progress step id → panel number (only for navigable steps)
-const stepToPanel: Record<number, number> = {
-  1: 1,
-  3: 3,
-  4: 3,
-  6: 5,
+  concerns: [
+    {
+      rank: 1,
+      label: "Data Access",
+      source: "Industry Pattern",
+      severity: "Critical",
+      explanation: "Multi-source ingestion (Drive, Notion, PDFs) is the #1 scope risk for this type of project. Similar proposals consistently underestimated the effort to handle diverse input formats reliably. 2 of 3 similar projects narrowed to a single source for their demo build."
+    },
+    {
+      rank: 2,
+      label: "Differentiation",
+      source: "Instructor Pattern",
+      severity: "Significant",
+      explanation: "The 'editable output' angle is your strongest differentiator but similar proposals lost this narrative by trying to also compete on design flexibility and multi-template support. Instructor feedback consistently advised: one opinionated template, focus on synthesis quality over layout variety."
+    },
+    {
+      rank: 3,
+      label: "Scope Risk",
+      source: "Instructor Pattern",
+      severity: "Moderate",
+      explanation: "Persistent memory for career tracking is a compelling v2 story but adds architectural complexity flagged as post-demo scope in similar projects. The MVP that shipped strongest was: one document type in -> one structured portfolio out -> fully editable."
+    }
+  ],
+  clarifying_questions: [
+    {
+      question_number: 1,
+      linked_concern: "Data Access",
+      question: "Which single document source will you support for your demo — Google Drive, a PDF upload, or something else — and do you have sample documents ready to test with today?"
+    },
+    {
+      question_number: 2,
+      linked_concern: "Differentiation",
+      question: "What does the editable output look like exactly — is it a rich text editor, a structured form, or something else — and what makes it feel different from pasting Claude output into Notion?"
+    },
+    {
+      question_number: 3,
+      linked_concern: "Scope Risk",
+      question: "If you had to cut persistent memory entirely for the demo, what would the core demo flow be — and is that still compelling enough to present on Demo Day?"
+    }
+  ],
+  similar_projects: [
+    { title: "PortfolioAI — Resume to Portfolio Generator", industry: "CareerTech", description: "An agent that takes a student's resume and LinkedIn profile and generates a structured portfolio page. Focused on content extraction and layout templating. Instructor flagged that single-source input kept scope manageable — multi-source ingestion was deferred to v2." },
+    { title: "CaseStudy Builder — PM Portfolio Tool", industry: "CareerTech", description: "Pulled project artifacts from Notion and Jira to auto-generate PM case studies. Hit scope issues when supporting multiple input formats. Strongest demo came from one source -> one clean editable output." },
+    { title: "WorkShowcase — UX Portfolio Generator", industry: "CareerTech", description: "Took Figma files and project write-ups to create a shareable UX portfolio. The 'editable output' framing was the right differentiator but time was lost on design customization. Synthesis quality mattered more than layout flexibility for the demo." }
+  ]
 }
 
 export default function Home() {
-  const [currentPanel, setCurrentPanel] = useState(1)
-  const [idea, setIdea] = useState("")
-  const [answers, setAnswers] = useState(["", "", ""])
-  const [ideaError, setIdeaError] = useState(false)
+  // Core state
+  const [currentPage, setCurrentPage] = useState<Page>('evaluate')
+  const [role, setRole] = useState<Role>('student')
+  
+  // Form state
+  const [formData, setFormData] = useState<ProjectFormData>({
+    name: 'MunchMate',
+    persona: 'Parents of toddlers with food neophobia (fear of new foods), nutritional therapists, and other medical professionals or family carers supporting picky eaters',
+    what: 'Managing toddler food neophobia is less about giving a recipe and more about dynamic strategy, persistence, and data tracking — areas where agentic AI shines. No tool exists that proactively plans a child\'s food exposure journey, adapts to daily context (mood, environment), and tracks the 15+ exposures typically needed for acceptance. MunchMate solves this: an agentic coach that builds personalised food chains, adjusts goals in real-time, and remembers every exposure milestone so parents always know the next right move.',
+    agentic: 'MunchMate requires multi-step reasoning that cannot be done in a single prompt. Step 1: Build a food chain from known safe foods using bridge-food logic (e.g. crackers → toast → hummus on toast). Step 2: Adjust the daily goal based on context input ("he\'s cranky today, we\'re at Grandma\'s") — shifting from "try something new" to "maintain peace with a safe food." Step 3: Track exposure history across sessions (touched, licked, tasted) and use prior wins to plan the next move. Step 4: Vision/audio integration — snap a fridge photo to identify available bridge foods, or check in via audio for real-time recommendations.',
+    moat: 'An agentic solution is a proactive strategist — it manages the process, not just the advice. Details: the system accumulates exposure history and context patterns specific to each child over time, making generic copying impossible. Nutritional therapist adoption embeds clinical frameworks into the tool, creating proprietary course-specific logic that compounds with every cohort of families served.'
+  })
+  
+  // MVP state
+  const [mvpData, setMvpData] = useState({
+    description: '',
+    features: '',
+    notBuilding: ''
+  })
+  
+  // Evaluation state
+  const [isLoading, setIsLoading] = useState(false)
+  const [evaluationResponse, setEvaluationResponse] = useState<EvaluationResponse | null>(null)
+  const [scores, setScores] = useState<Scores | null>(null)
+  const [questionAnswers, setQuestionAnswers] = useState<Record<number, string>>({})
+  const [rawApiResponse, setRawApiResponse] = useState<string | null>(null)
+  const [apiError, setApiError] = useState<string | null>(null)
+  
+  // Progress state
+  const [evaluated, setEvaluated] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [instructorApproved, setInstructorApproved] = useState(false)
+  const [mvpDefined, setMvpDefined] = useState(false)
+  const [instructorComments, setInstructorComments] = useState('')
+  
+  // Toast state
+  const [toast, setToast] = useState({ message: '', type: 'info' as 'success' | 'info', isVisible: false })
 
-  const currentStep = progressMap[currentPanel] || currentPanel
+  const showToast = useCallback((message: string, type: 'success' | 'info') => {
+    setToast({ message, type, isVisible: true })
+  }, [])
 
-  const updateAnswer = (index: number, value: string) => {
-    setAnswers((prev) => {
-      const newAnswers = [...prev]
-      newAnswers[index] = value
-      return newAnswers
-    })
-  }
+  const hideToast = useCallback(() => {
+    setToast(prev => ({ ...prev, isVisible: false }))
+  }, [])
 
-  const handleStepClick = (stepId: number) => {
-    const panel = stepToPanel[stepId]
-    if (panel !== undefined) {
-      setCurrentPanel(panel)
-      window.scrollTo(0, 0)
-    }
-  }
+  // Navigation steps
+  const navSteps: NavStep[] = [
+    { id: 'evaluate', label: 'Evaluate', badge: 1, locked: false, done: evaluated },
+    { id: 'coach', label: 'AgenticFit Coach', badge: 2, locked: !evaluated, done: submitted },
+    { id: 'instructor', label: 'Instructor Review', badge: 3, locked: !submitted, done: instructorApproved },
+    { id: 'mvp', label: 'Define MVP', badge: 4, locked: !instructorApproved, done: mvpDefined },
+    { id: 'buildplan', label: 'Build Plan', badge: 5, locked: !mvpDefined, done: false },
+  ]
 
-  const goTo = (panel: number) => {
-    if (panel === 2) {
-      if (!idea.trim()) {
-        setIdeaError(true)
-        return
+  // Calculate scores based on mock evaluation response (matching the screenshots)
+  const calculateScores = (_data: ProjectFormData, round: number): Scores => {
+    // Round 1: Initial evaluation matching MEDIUM overall score from mock response
+    if (round === 1) {
+      return {
+        agenticFit: 'Medium',
+        persona: 'Low',
+        painPoint: 'Low',
+        complexity: 'Medium',
+        moat: 'Low',
+        buildRisk: 'High'
       }
-      setIdeaError(false)
-      setCurrentPanel(2)
-      setTimeout(() => {
-        setCurrentPanel(3)
-        window.scrollTo(0, 0)
-      }, 2400)
-    } else if (panel === 4) {
-      setCurrentPanel(4)
-      setTimeout(() => {
-        setCurrentPanel(5)
-        window.scrollTo(0, 0)
-      }, 2800)
-    } else {
-      setCurrentPanel(panel)
-      window.scrollTo(0, 0)
+    }
+    // Round 2+: Improved scores after coaching
+    return {
+      agenticFit: 'Low',
+      persona: 'Low',
+      painPoint: 'Low',
+      complexity: 'Low',
+      moat: 'Low',
+      buildRisk: 'Low'
     }
   }
 
-  useEffect(() => {
-    if (ideaError && idea.trim()) {
-      setIdeaError(false)
+  // Handlers
+  const handlePageChange = (page: Page) => {
+    const step = navSteps.find(s => s.id === page)
+    if (step && !step.locked) {
+      setCurrentPage(page)
     }
-  }, [idea, ideaError])
+  }
+
+  const handleEvaluate = async () => {
+    setIsLoading(true)
+    setRawApiResponse(null)
+    setApiError(null)
+    
+    try {
+      const response = await fetch('https://loreleifara.app.n8n.cloud/webhook-test/31cf455f-5074-4b84-ad91-a8571323154d', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          projectName: formData.name,
+          targetPersona: formData.persona,
+          projectDescription: formData.what,
+          whyAgentic: formData.agentic,
+          moat: formData.moat
+        })
+      })
+      
+      const rawText = await response.text()
+      console.log('[v0] Raw API Response:', rawText)
+      console.log('[v0] Response Status:', response.status)
+      setRawApiResponse(rawText)
+      
+      // Parse the JSON response
+      if (!response.ok) {
+        throw new Error(`API returned status ${response.status}: ${rawText}`)
+      }
+      
+      try {
+        const jsonData = JSON.parse(rawText) as EvaluationResponse
+        console.log('[v0] Parsed JSON:', jsonData)
+        
+        // Set the evaluation response from the actual API
+        setEvaluationResponse(jsonData)
+        setEvaluated(true)
+        showToast('Evaluation complete — review your results below', 'success')
+      } catch (parseError) {
+        console.log('[v0] Response is not valid JSON:', parseError)
+        console.log('[v0] Raw response was:', rawText)
+        throw new Error(`Failed to parse API response as JSON. Received: ${rawText.substring(0, 100)}`)
+      }
+    } catch (error) {
+      console.error('[v0] API Error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      setApiError(errorMessage)
+      showToast('Failed to evaluate — check the error message below', 'info')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleCancelLoading = () => {
+    setIsLoading(false)
+    showToast('Analysis stopped — edit your idea and try again', 'info')
+  }
+
+  const handleGoToCoach = () => {
+    setCurrentPage('coach')
+    window.scrollTo(0, 0)
+  }
+
+  const handleResubmit = () => {
+    const newScores = calculateScores(formData, 2)
+    setScores(newScores)
+    showToast('Re-evaluation complete — your scores have been updated', 'success')
+  }
+
+  const handleSkipToInstructor = () => {
+    setSubmitted(true)
+    setCurrentPage('instructor')
+    window.scrollTo(0, 0)
+    showToast('Submitted for instructor review', 'success')
+  }
+
+  const handleDemoApprove = () => {
+    setInstructorApproved(true)
+    setInstructorComments('Strong foundation — the RAG retrieval and scoring pipeline are well-defined. Focus your MVP on the single-round evaluation flow first. The iterative coaching loop can come in v2. Looking forward to seeing your demo!')
+    showToast('Your project has been approved!', 'success')
+  }
+
+  const handleGoToMvp = () => {
+    setCurrentPage('mvp')
+    window.scrollTo(0, 0)
+  }
+
+  const handleGeneratePlan = () => {
+    setMvpDefined(true)
+    setCurrentPage('buildplan')
+    window.scrollTo(0, 0)
+    showToast('Your build plan has been generated!', 'success')
+  }
+
+  const handleAnswerChange = (questionNumber: number, answer: string) => {
+    setQuestionAnswers(prev => ({ ...prev, [questionNumber]: answer }))
+  }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
-      <Header />
-      <ProgressBar currentStep={currentStep} onStepClick={handleStepClick} />
+    <div className="min-h-screen bg-[var(--bg)]">
+      <Navigation
+        currentPage={currentPage}
+        role={role}
+        userName="Lorelei"
+        userInitials="LF"
+        steps={navSteps}
+        onPageChange={handlePageChange}
+        onRoleChange={setRole}
+      />
 
-      <main className="max-w-[680px] mx-auto px-4 py-8 pb-16">
-        {/* Panel 1: Idea Input */}
-        {currentPanel === 1 && (
-          <div className="animate-fade-up">
-            <h1 className="text-3xl md:text-[40px] font-bold text-[#161616] mb-2 tracking-tight leading-tight">
-              {"What's your project idea"}<span className="text-[#FF6B00]">.</span>
-            </h1>
-            <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
-              {"Give us a rough description — 2 to 3 sentences is enough. Include a Project Name, Target Persona, the pain point and use case you are solving for, and your MOAT.  "}
-            </p>
+      {currentPage === 'evaluate' && (
+        <EvaluatePage
+          formData={formData}
+          onFormChange={setFormData}
+          onSubmit={handleEvaluate}
+          isLoading={isLoading}
+          onCancelLoading={handleCancelLoading}
+          evaluationResponse={evaluationResponse}
+          scores={scores}
+          onGoToCoach={handleGoToCoach}
+          questionAnswers={questionAnswers}
+          onAnswerChange={handleAnswerChange}
+          rawApiResponse={rawApiResponse}
+          apiError={apiError}
+        />
+      )}
 
-            <div className="bg-white border border-[#e5e5e5] rounded-2xl p-5 shadow-sm mb-5">
-              <label className="text-sm font-semibold text-[#161616] mb-2 block">
-                Describe your idea
-              </label>
-              <Textarea
-                value={idea}
-                onChange={(e) => setIdea(e.target.value)}
-                placeholder="e.g. I want to build an AI tool that helps ER nurses reduce the time they spend on documentation after each patient visit..."
-                className={`min-h-[120px] bg-[#f5f5f5] border-0 rounded-xl px-4 py-3 text-base text-[#161616] leading-relaxed resize-y focus:ring-2 placeholder:text-[#8a8a8a]/70 ${
-                  ideaError ? "ring-2 ring-[#DE350B]/50" : "focus:ring-[#FF6B00]/20"
-                }`}
-              />
-              <p className="text-sm text-[#8a8a8a] mt-3">
-                {"This is your starting point, not your final submission."}
-              </p>
-            </div>
+      {currentPage === 'coach' && (
+        <CoachPage
+          isLocked={!evaluated}
+          formData={formData}
+          onFormChange={setFormData}
+          scores={scores}
+          clarifyingQuestions={evaluationResponse?.clarifying_questions || []}
+          questionAnswers={questionAnswers}
+          onAnswerChange={handleAnswerChange}
+          onResubmit={handleResubmit}
+          onSkipToInstructor={handleSkipToInstructor}
+        />
+      )}
 
-            <div className="inline-flex items-center gap-2 bg-[#FFF7E6] border border-[#FF991F]/20 rounded-full px-4 py-2 text-sm text-[#4a4a4a] mb-6">
-              <AlertTriangle className="w-4 h-4 text-[#FF991F]" />
-              <span>Calibrated for 6-8 week student builds</span>
-            </div>
+      {currentPage === 'instructor' && (
+        <InstructorPage
+          role={role}
+          isLocked={!evaluated}
+          isSubmitted={submitted}
+          projectName={formData.name}
+          isApproved={instructorApproved}
+          instructorComments={instructorComments}
+          onDemoApprove={handleDemoApprove}
+          onGoToMvp={handleGoToMvp}
+        />
+      )}
 
-            <div className="flex gap-3">
-              <Button
-                onClick={() => goTo(2)}
-                className="bg-[#FF6B00] hover:bg-[#E55D00] text-white px-6 py-2.5 h-auto text-sm font-semibold rounded-full transition-all flex items-center gap-2"
-              >
-                Analyze my idea
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        )}
+      {currentPage === 'mvp' && (
+        <MvpPage
+          isLocked={!instructorApproved}
+          projectName={formData.name}
+          scores={scores}
+          mvpData={mvpData}
+          onMvpChange={setMvpData}
+          onGeneratePlan={handleGeneratePlan}
+        />
+      )}
 
-        {/* Panel 2: Loading */}
-        {currentPanel === 2 && (
-          <div className="animate-fade-up">
-            <LoadingCard
-              status="Searching 200 past cohort projects"
-              title="Finding similar ideas..."
-            />
-          </div>
-        )}
+      {currentPage === 'buildplan' && (
+        <BuildPlanPage
+          isLocked={!mvpDefined}
+          projectName={formData.name}
+          scores={scores}
+          buildPlan={[]}
+        />
+      )}
 
-        {/* Panel 3: Questions */}
-        {currentPanel === 3 && (
-          <div className="animate-fade-up">
-            <h1 className="text-3xl md:text-[40px] font-bold text-[#161616] mb-2 tracking-tight leading-tight">
-              Before you go further<span className="text-[#FF6B00]">.</span>
-            </h1>
-            <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
-              Based on similar past projects, answer these questions honestly.
-            </p>
-
-            <div className="bg-[#E3F5ED] border border-[#00875A]/20 rounded-2xl p-4 flex items-start gap-3 mb-5">
-              <div className="w-8 h-8 bg-[#00875A] rounded-full flex items-center justify-center shrink-0">
-                <Info className="w-4 h-4 text-white" />
-              </div>
-              <div className="text-sm text-[#161616] leading-relaxed">
-                <strong className="font-semibold text-[#00875A]">3 similar past projects retrieved.</strong>{" "}
-                Two hit data access issues in week 4. These questions target those patterns.
-              </div>
-            </div>
-
-            {questions.map((q, index) => (
-              <QuestionCard
-                key={index}
-                number={index + 1}
-                question={q.question}
-                why={q.why}
-                placeholder={q.placeholder}
-                value={answers[index]}
-                onChange={(value) => updateAnswer(index, value)}
-              />
-            ))}
-
-            <div className="flex gap-3 mt-6">
-              <Button
-                onClick={() => goTo(4)}
-                className="bg-[#FF6B00] hover:bg-[#E55D00] text-white px-6 py-2.5 h-auto text-sm font-semibold rounded-full transition-all flex items-center gap-2"
-              >
-                Submit my answers
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Panel 4: Loading */}
-        {currentPanel === 4 && (
-          <div className="animate-fade-up">
-            <LoadingCard
-              status="Running full evaluation"
-              title="Applying rubric to your submission..."
-            />
-          </div>
-        )}
-
-        {/* Panel 5: Verdict */}
-        {currentPanel === 5 && (
-          <div className="animate-fade-up">
-            <div className="bg-white border border-[#e5e5e5] rounded-2xl p-4 text-sm text-[#4a4a4a] leading-relaxed mb-5">
-              <div className="text-xs font-semibold text-[#8a8a8a] uppercase tracking-wider mb-1">
-                Your idea
-              </div>
-              <p className="italic">
-                {idea || "An AI tool that helps ER nurses reduce documentation time after patient visits."}
-              </p>
-            </div>
-
-            <VerdictBanner type="narrow" title="Proceed with narrower scope" />
-
-            <OutputSection label="Rationale">
-              {"This is a genuinely agentic problem — the system needs to listen, classify clinical significance, make field-mapping decisions, and handle variation across case types. However, the data access plan for a 6-week build is underspecified. Healthcare integrations with real EHR systems require months of API access negotiation."}
-            </OutputSection>
-
-            <OutputSection label="MVP suggestion — achievable in 6 weeks" variant="dark">
-              Build a voice-to-structured-note tool using synthetic clinical scenarios. Skip EHR integration entirely — output a formatted JSON summary that <em className="text-[#FF6B00] not-italic font-medium">could</em> map to Epic fields, but demonstrate via a simple UI.
-            </OutputSection>
-
-            <OutputSection label="Similar past projects">
-              {comparables.map((c, index) => (
-                <ComparableItem
-                  key={c.id}
-                  {...c}
-                  isLast={index === comparables.length - 1}
-                />
-              ))}
-            </OutputSection>
-
-            <OutputSection label="Risk flags">
-              <div className="flex flex-wrap gap-2 mb-3">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FFEBE6] text-[#DE350B]">
-                  Regulated domain
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FFF7E6] text-[#FF991F]">
-                  Data access complexity
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FFF7E6] text-[#FF991F]">
-                  EHR integration scope
-                </span>
-              </div>
-              <p className="text-[15px] text-[#4a4a4a] leading-relaxed mt-3">
-                Healthcare projects have a 66% rate of scope-related pivots.
-              </p>
-            </OutputSection>
-
-            <div className="flex flex-wrap gap-3 mt-6">
-              <Button
-                onClick={() => goTo(1)}
-                className="bg-[#FF6B00] hover:bg-[#E55D00] text-white px-6 py-2.5 h-auto text-sm font-semibold rounded-full transition-all flex items-center gap-2"
-              >
-                <Sparkles className="w-4 h-4" />
-                Evaluate another idea
-              </Button>
-              <Button
-                variant="outline"
-                className="border border-[#e5e5e5] text-[#161616] hover:bg-[#f5f5f5] px-5 py-2.5 h-auto text-sm font-semibold rounded-full bg-white flex items-center gap-2"
-              >
-                <FileDown className="w-4 h-4" />
-                Export as PDF
-              </Button>
-            </div>
-
-            <div className="bg-[#FFF7E6] border border-[#FF991F]/20 rounded-2xl p-4 text-sm text-[#4a4a4a] leading-relaxed mt-6 flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-[#FF991F] shrink-0 mt-0.5" />
-              <span>
-                This evaluation is calibrated for an 8-week student build, not a production deployment.
-              </span>
-            </div>
-          </div>
-        )}
-      </main>
+      <AppToast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onHide={hideToast}
+      />
     </div>
   )
 }
