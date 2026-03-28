@@ -78,6 +78,9 @@ export default function Home() {
   const [idea, setIdea] = useState("")
   const [answers, setAnswers] = useState(["", "", ""])
   const [ideaError, setIdeaError] = useState(false)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<unknown>(null)
+  const [analysisError, setAnalysisError] = useState<string | null>(null)
 
   const currentStep = progressMap[currentPanel] || currentPanel
 
@@ -105,22 +108,31 @@ export default function Home() {
       }
       setIdeaError(false)
       setCurrentPanel(2)
+      setIsAnalyzing(true)
+      setAnalysisError(null)
 
-      // Send idea to webhook via API route
+      // Send idea to webhook via API route and wait for response
       try {
-        await fetch("/api/analyze", {
+        const response = await fetch("/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ projectDescription: idea }),
         })
+        
+        if (!response.ok) {
+          throw new Error("Failed to analyze idea")
+        }
+        
+        const data = await response.json()
+        setAnalysisResult(data)
       } catch (error) {
         console.error("Failed to send to webhook:", error)
-      }
-
-      setTimeout(() => {
+        setAnalysisError("Failed to analyze your idea. Please try again.")
+      } finally {
+        setIsAnalyzing(false)
         setCurrentPanel(3)
         window.scrollTo(0, 0)
-      }, 2400)
+      }
     } else if (panel === 4) {
       setCurrentPanel(4)
       setTimeout(() => {
@@ -208,6 +220,34 @@ export default function Home() {
             <p className="text-base text-[#4a4a4a] leading-relaxed mb-6">
               Based on similar past projects, answer these questions honestly.
             </p>
+
+            {/* Analysis Result Display */}
+            {analysisError && (
+              <div className="bg-[#FFEBE6] border border-[#DE350B]/20 rounded-2xl p-4 flex items-start gap-3 mb-5">
+                <div className="w-8 h-8 bg-[#DE350B] rounded-full flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-sm text-[#161616] leading-relaxed">
+                  <strong className="font-semibold text-[#DE350B]">Analysis failed.</strong>{" "}
+                  {analysisError}
+                </div>
+              </div>
+            )}
+
+            {analysisResult && !analysisError && (
+              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-5 shadow-sm mb-5">
+                <label className="text-sm font-semibold text-[#161616] mb-3 block">
+                  Analysis Result
+                </label>
+                <div className="bg-[#f5f5f5] rounded-xl p-4 text-sm text-[#4a4a4a] leading-relaxed overflow-auto max-h-[300px]">
+                  <pre className="whitespace-pre-wrap font-mono text-xs">
+                    {typeof analysisResult === 'string' 
+                      ? analysisResult 
+                      : JSON.stringify(analysisResult, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            )}
 
             <div className="bg-[#E3F5ED] border border-[#00875A]/20 rounded-2xl p-4 flex items-start gap-3 mb-5">
               <div className="w-8 h-8 bg-[#00875A] rounded-full flex items-center justify-center shrink-0">
