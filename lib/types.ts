@@ -38,9 +38,9 @@ export interface Concern {
 
 // Similar project type
 export interface SimilarProject {
-  title: string
-  industry: string
-  description: string
+  project_name: string
+  industry?: string
+  similarity_reason: string
 }
 
 // Clarifying question type
