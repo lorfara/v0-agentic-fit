@@ -163,7 +163,7 @@ export default function Home() {
     setApiError(null)
     
     try {
-      const response = await fetch('https://loreleifara.app.n8n.cloud/webhook-test/31cf455f-5074-4b84-ad91-a8571323154d', {
+      const response = await fetch('/api/evaluate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -191,6 +191,11 @@ export default function Home() {
         const jsonData = JSON.parse(rawText) as EvaluationResponse
         console.log('[v0] Parsed JSON:', jsonData)
         
+        // Check if response has an error property (from our API route)
+        if (jsonData && typeof jsonData === 'object' && 'error' in jsonData) {
+          throw new Error((jsonData as { error: string }).error)
+        }
+        
         // Set the evaluation response from the actual API
         setEvaluationResponse(jsonData)
         setEvaluated(true)
@@ -198,7 +203,9 @@ export default function Home() {
       } catch (parseError) {
         console.log('[v0] Response is not valid JSON:', parseError)
         console.log('[v0] Raw response was:', rawText)
-        throw new Error(`Failed to parse API response as JSON. Received: ${rawText.substring(0, 100)}`)
+        // Show the raw response so user can debug
+        setRawApiResponse(rawText)
+        throw new Error(`API response was not valid JSON`)
       }
     } catch (error) {
       console.error('[v0] API Error:', error)
