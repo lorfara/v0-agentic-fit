@@ -2,71 +2,8 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { AlertTriangle, ArrowRight, MessageSquare, Star, X } from "lucide-react"
+import { AlertTriangle, ArrowRight, MessageSquare, X } from "lucide-react"
 import type { EvaluationResponse } from "@/lib/types"
-
-// Star rating widget shown after results have loaded
-function StarRating() {
-  const [hovered, setHovered] = useState<number | null>(null)
-  const [selected, setSelected] = useState<number | null>(null)
-  const [comment, setComment] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-
-  const handleSelect = (rating: number) => {
-    setSelected(rating)
-    if (rating >= 4) setSubmitted(true)
-  }
-
-  return (
-    <div className="mt-6 pt-5 border-t border-[var(--border)] flex flex-col items-center gap-3">
-      <p className="text-[13px] text-[var(--muted)] font-medium">Was this evaluation helpful?</p>
-      <div className="flex items-center gap-1.5">
-        {[1, 2, 3, 4, 5].map((star) => {
-          const filled = (hovered ?? selected ?? 0) >= star
-          return (
-            <button
-              key={star}
-              onClick={() => handleSelect(star)}
-              onMouseEnter={() => setHovered(star)}
-              onMouseLeave={() => setHovered(null)}
-              aria-label={`Rate ${star} out of 5`}
-              className="p-0.5 transition-transform hover:scale-110"
-            >
-              <Star
-                className="w-7 h-7 transition-colors"
-                style={{
-                  fill: filled ? 'var(--orange)' : 'transparent',
-                  stroke: filled ? 'var(--orange)' : 'var(--border)',
-                  strokeWidth: 1.5,
-                }}
-              />
-            </button>
-          )
-        })}
-      </div>
-      {selected !== null && selected <= 3 && !submitted && (
-        <div className="w-full flex flex-col gap-2 mt-1">
-          <input
-            type="text"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="What could be improved?"
-            className="w-full py-2 px-3 border-2 border-[var(--border)] rounded-lg text-sm outline-none focus:border-[var(--orange)] transition-colors"
-          />
-          <button
-            onClick={() => setSubmitted(true)}
-            className="self-end text-xs font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] transition-colors"
-          >
-            Submit feedback
-          </button>
-        </div>
-      )}
-      {submitted && (
-        <p className="text-[13px] text-[var(--muted)]">Thanks for your feedback!</p>
-      )}
-    </div>
-  )
-}
 
 interface EvalResultsProps {
   data: EvaluationResponse
@@ -124,7 +61,7 @@ function AskTheCoach({ itemId, context, openingMessage }: { itemId: string; cont
           {/* Chat messages area */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[180px]">
             {messages.map((msg, idx) => (
-              <div key={`${msg.role}-${idx}`} className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}>
+              <div key={idx} className={cn("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}>
                 <div 
                   className={cn(
                     "rounded-lg px-3 py-2 text-sm",
@@ -242,10 +179,10 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
               <p className="text-sm text-[var(--text)]">{agentic_fit.justification}</p>
             </div>
             <div className="space-y-3">
-              {agentic_fit.criteria.map((criterion) => {
+              {agentic_fit.criteria.map((criterion, index) => {
                 const style = VERDICT_STYLES[criterion.verdict] || VERDICT_STYLES['Partial fit']
                 return (
-                  <div key={criterion.name} className="rounded-lg p-4" style={{ background: style.bg, borderLeft: `4px solid ${style.color}` }}>
+                  <div key={index} className="rounded-lg p-4" style={{ background: style.bg, borderLeft: `4px solid ${style.color}` }}>
                     <div className="flex items-center justify-between mb-2">
                       <div className="text-[15px] font-bold text-[var(--text)]">{criterion.name}</div>
                       <div className="flex items-center gap-1.5">
@@ -311,12 +248,8 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
             {similar_projects && similar_projects.length > 0 ? (
               similar_projects.map((project) => (
                 <div key={project.project_name} className="bg-[var(--bg)] rounded-lg p-4 border-2 border-[var(--border)]">
-                  <div className="font-bold text-[var(--text)] mb-1.5">{project.project_name}</div>
-                  {project.industry && (
-                    <span className="inline-block text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded bg-[var(--border)] text-[var(--muted)] mb-2">
-                      {project.industry}
-                    </span>
-                  )}
+                  <div className="font-bold text-[var(--text)] mb-0.5">{project.project_name}</div>
+                  <div className="text-[13px] text-[var(--muted)] italic mb-2">{project.student_name}</div>
                   <div className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{project.similarity_reason}</div>
                 </div>
               ))
@@ -365,9 +298,6 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
           </div>
         )}
       </div>
-
-      {/* Helpfulness rating — shown only after results are loaded */}
-      <StarRating />
     </div>
   )
 }

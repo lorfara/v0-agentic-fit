@@ -39,7 +39,7 @@ export interface Concern {
 // Similar project type
 export interface SimilarProject {
   project_name: string
-  industry?: string
+  student_name: string
   similarity_reason: string
 }
 
