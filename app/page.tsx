@@ -181,20 +181,19 @@ export default function Home() {
       console.log('[v0] Raw API Response:', rawText)
       setRawApiResponse(rawText)
       
-      // Try to parse as JSON for the evaluation
+      // Parse the JSON response
       try {
-        const jsonData = JSON.parse(rawText)
+        const jsonData = JSON.parse(rawText) as EvaluationResponse
         console.log('[v0] Parsed JSON:', jsonData)
-      } catch {
-        console.log('[v0] Response is not valid JSON')
+        
+        // Set the evaluation response from the actual API
+        setEvaluationResponse(jsonData)
+        setEvaluated(true)
+        showToast('Evaluation complete — review your results below', 'success')
+      } catch (parseError) {
+        console.log('[v0] Response is not valid JSON:', parseError)
+        throw new Error('API response was not valid JSON')
       }
-      
-      // Use mock response for now to keep UI working
-      const newScores = calculateScores(formData, 1)
-      setScores(newScores)
-      setEvaluationResponse(MOCK_EVALUATION_RESPONSE)
-      setEvaluated(true)
-      showToast('Evaluation complete — review your results below', 'success')
     } catch (error) {
       console.error('[v0] API Error:', error)
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'

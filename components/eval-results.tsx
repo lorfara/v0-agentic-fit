@@ -30,6 +30,25 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
   const [activeTab, setActiveTab] = useState<Tab>('agentic')
   const { agentic_fit, concerns, similar_projects, clarifying_questions } = data
 
+  // Determine banner color based on highest severity
+  const highestSeverity = concerns.length > 0 
+    ? concerns.reduce((highest, concern) => {
+        const severityOrder = { 'Critical': 3, 'Significant': 2, 'Moderate': 1 }
+        return (severityOrder[concern.severity as keyof typeof severityOrder] || 0) > 
+               (severityOrder[highest.severity as keyof typeof severityOrder] || 0) 
+          ? concern 
+          : highest
+      }).severity
+    : 'Moderate'
+
+  const bannerStyles = {
+    'Critical': { bg: '#fee2e2', border: '#fca5a5', textBold: '#991b1b', textLight: '#7f1d1d' },
+    'Significant': { bg: '#fef3c7', border: '#fcd34d', textBold: '#92400e', textLight: '#78350f' },
+    'Moderate': { bg: '#d1fae5', border: '#6ee7b7', textBold: '#065f46', textLight: '#047857' }
+  }
+  
+  const style = bannerStyles[highestSeverity as keyof typeof bannerStyles] || bannerStyles.Moderate
+
   const tabs = [
     { id: 'agentic' as Tab, label: 'Agentic Fit' },
     { id: 'concerns' as Tab, label: 'Concerns', count: concerns.length },
@@ -39,11 +58,11 @@ export function EvalResults({ data, onGoToCoach, questionAnswers, onAnswerChange
 
   return (
     <div className="bg-white rounded-lg border border-[var(--border)] overflow-hidden" style={{ boxShadow: 'var(--shadow)' }}>
-      <div className="bg-[#fee2e2] border-b-2 border-[#fca5a5] px-6 py-4 flex items-start gap-3">
-        <AlertTriangle className="w-5 h-5 text-[#dc2626] flex-shrink-0 mt-0.5" />
+      <div className="border-b-2 px-6 py-4 flex items-start gap-3" style={{ background: style.bg, borderColor: style.border }}>
+        <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: bannerStyles[highestSeverity as keyof typeof bannerStyles]?.border }} />
         <div>
-          <div className="font-bold text-[#991b1b] mb-1">High risk of not completing this project as described in 6 weeks.</div>
-          <div className="text-sm text-[#7f1d1d]">Review the agentic fit assessment and concerns below. Answer the clarifying questions before strengthening your build.</div>
+          <div className="font-bold mb-1" style={{ color: style.textBold }}>High risk of not completing this project as described in 6 weeks.</div>
+          <div className="text-sm" style={{ color: style.textLight }}>Review the agentic fit assessment and concerns below. Answer the clarifying questions before strengthening your build.</div>
         </div>
       </div>
 
