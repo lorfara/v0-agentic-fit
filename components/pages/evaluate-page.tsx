@@ -2,7 +2,7 @@
 
 import { ProjectForm } from "@/components/project-form"
 import { EvaluationLoading } from "@/components/evaluation-loading"
-import { EvaluationResults } from "@/components/results-view"
+import { EvaluationResults } from "@/components/evaluation-results"
 import { ScorecardPanel } from "@/components/scorecard-panel"
 import type { ProjectFormData, EvaluationResponse, Scores } from "@/lib/types"
 
