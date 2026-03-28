@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { AlertTriangle, ArrowRight, MessageSquare } from "lucide-react"
-import { AIAssistant } from "@/components/ai-assistant"
+import { InlineAIAssistant } from "@/components/inline-ai-assistant"
 import type { EvaluationResponse, RiskLevel } from "@/lib/types"
 
 interface EvaluationResultsProps {
@@ -41,7 +41,7 @@ const AGENTIC_SCORE_STYLES = {
 
 export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswerChange }: EvaluationResultsProps) {
   const [activeTab, setActiveTab] = useState<Tab>('agentic')
-  const [aiAssistantOpen, setAiAssistantOpen] = useState(false)
+  const [expandedAssistant, setExpandedAssistant] = useState<string | null>(null)
   const [aiContext, setAiContext] = useState<AIContext>({ type: 'criterion', title: '', content: '' })
   
   const { agentic_fit, concerns, similar_projects, clarifying_questions } = data
@@ -86,14 +86,13 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
     { id: 'questions', label: 'Questions', count: clarifying_questions.length, countBg: 'var(--blue)' },
   ]
 
-  const openAIAssistant = (type: AIContext['type'], title: string, content: string) => {
+  const openAIAssistant = (assistantId: string, type: AIContext['type'], title: string, content: string) => {
     setAiContext({ type, title, content })
-    setAiAssistantOpen(true)
+    setExpandedAssistant(expandedAssistant === assistantId ? null : assistantId)
   }
 
   return (
-    <>
-      <div className="bg-[var(--card)] rounded-[var(--radius)] overflow-hidden mb-5" style={{ boxShadow: 'var(--shadow)' }}>
+    <div className="bg-[var(--card)] rounded-[var(--radius)] overflow-hidden mb-5" style={{ boxShadow: 'var(--shadow)' }}>
         <div className="p-6">
           {/* Risk Alert Banner */}
           <div 
@@ -176,40 +175,48 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
               <div className="space-y-3">
                 {agentic_fit.criteria.map((criterion, index) => {
                   const style = VERDICT_STYLES[criterion.verdict] || VERDICT_STYLES['Partial fit']
+                  const assistantId = `criterion-${index}`
                   return (
-                    <div 
-                      key={index}
-                      className="rounded-lg p-4"
-                      style={{ 
-                        background: style.bg, 
-                        borderLeft: `4px solid ${style.color}`
-                      }}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="text-[15px] font-bold text-[var(--text)]">{criterion.name}</div>
-                        <div className="flex items-center gap-1.5">
-                          <span 
-                            className="w-2.5 h-2.5 rounded-full"
-                            style={{ background: style.color }}
-                          ></span>
-                          <span 
-                            className="text-sm font-semibold"
-                            style={{ color: style.color }}
-                          >
-                            {criterion.verdict}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="text-[13px] text-[var(--text-secondary)] leading-relaxed mb-2">
-                        {criterion.reasoning}
-                      </div>
-                      <button 
-                        onClick={() => openAIAssistant('criterion', criterion.name, criterion.reasoning)}
-                        className="text-[13px] font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] flex items-center gap-1.5"
+                    <div key={index}>
+                      <div 
+                        className="rounded-lg p-4"
+                        style={{ 
+                          background: style.bg, 
+                          borderLeft: `4px solid ${style.color}`
+                        }}
                       >
-                        <MessageSquare className="w-3.5 h-3.5" />
-                        Ask AI about this
-                      </button>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="text-[15px] font-bold text-[var(--text)]">{criterion.name}</div>
+                          <div className="flex items-center gap-1.5">
+                            <span 
+                              className="w-2.5 h-2.5 rounded-full"
+                              style={{ background: style.color }}
+                            ></span>
+                            <span 
+                              className="text-sm font-semibold"
+                              style={{ color: style.color }}
+                            >
+                              {criterion.verdict}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-[13px] text-[var(--text-secondary)] leading-relaxed mb-2">
+                          {criterion.reasoning}
+                        </div>
+                        <button 
+                          onClick={() => openAIAssistant(assistantId, 'criterion', criterion.name, criterion.reasoning)}
+                          className="text-[13px] font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] flex items-center gap-1.5"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          Ask AI about this
+                        </button>
+                      </div>
+                      {expandedAssistant === assistantId && (
+                        <InlineAIAssistant
+                          context={aiContext}
+                          onClose={() => setExpandedAssistant(null)}
+                        />
+                      )}
                     </div>
                   )
                 })}
@@ -236,50 +243,58 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
               <div className="space-y-3">
                 {concerns.map((concern) => {
                   const style = SEVERITY_STYLES[concern.severity] || SEVERITY_STYLES.Moderate
+                  const assistantId = `concern-${concern.rank}`
                   return (
-                    <div 
-                      key={concern.rank}
-                      className="rounded-[10px] p-[18px_20px]"
-                      style={{ 
-                        background: style.bg, 
-                        border: `2px solid ${style.border}`,
-                        borderLeft: `4px solid ${style.color}`
-                      }}
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <span 
-                          className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center"
-                          style={{ background: style.color }}
-                        >
-                          {concern.rank}
-                        </span>
-                        <span className="text-[15px] font-bold text-[var(--text)]">
-                          {concern.label}
-                        </span>
-                        <span 
-                          className="ml-auto text-xs font-semibold py-0.5 px-2 rounded"
-                          style={{ 
-                            background: style.bg, 
-                            color: style.color,
-                            border: `1px solid ${style.border}`
-                          }}
-                        >
-                          {concern.severity}
-                        </span>
-                      </div>
-                      <div className="text-sm text-[var(--muted)] mb-2 italic">
-                        Source: {concern.source}
-                      </div>
-                      <div className="text-sm text-[var(--text)] leading-relaxed mb-3">
-                        {concern.explanation}
-                      </div>
-                      <button 
-                        onClick={() => openAIAssistant('concern', concern.label, concern.explanation)}
-                        className="text-[13px] font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] flex items-center gap-1.5"
+                    <div key={concern.rank}>
+                      <div 
+                        className="rounded-[10px] p-[18px_20px]"
+                        style={{ 
+                          background: style.bg, 
+                          border: `2px solid ${style.border}`,
+                          borderLeft: `4px solid ${style.color}`
+                        }}
                       >
-                        <MessageSquare className="w-3.5 h-3.5" />
-                        Ask AI about this
-                      </button>
+                        <div className="flex items-center gap-3 mb-2">
+                          <span 
+                            className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center"
+                            style={{ background: style.color }}
+                          >
+                            {concern.rank}
+                          </span>
+                          <span className="text-[15px] font-bold text-[var(--text)]">
+                            {concern.label}
+                          </span>
+                          <span 
+                            className="ml-auto text-xs font-semibold py-0.5 px-2 rounded"
+                            style={{ 
+                              background: style.bg, 
+                              color: style.color,
+                              border: `1px solid ${style.border}`
+                            }}
+                          >
+                            {concern.severity}
+                          </span>
+                        </div>
+                        <div className="text-sm text-[var(--muted)] mb-2 italic">
+                          Source: {concern.source}
+                        </div>
+                        <div className="text-sm text-[var(--text)] leading-relaxed mb-3">
+                          {concern.explanation}
+                        </div>
+                        <button 
+                          onClick={() => openAIAssistant(assistantId, 'concern', concern.label, concern.explanation)}
+                          className="text-[13px] font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] flex items-center gap-1.5"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          Ask AI about this
+                        </button>
+                      </div>
+                      {expandedAssistant === assistantId && (
+                        <InlineAIAssistant
+                          context={aiContext}
+                          onClose={() => setExpandedAssistant(null)}
+                        />
+                      )}
                     </div>
                   )
                 })}
@@ -348,39 +363,49 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
               </div>
 
               <div className="space-y-4">
-                {clarifying_questions.map((q) => (
-                  <div 
-                    key={q.question_number}
-                    className="bg-[var(--bg)] rounded-[10px] p-[16px_18px] border-2 border-[var(--border)] transition-colors hover:border-[var(--blue)]"
-                  >
-                    <div className="flex items-start gap-3.5 mb-3">
-                      <span className="w-7 h-7 rounded-full bg-[var(--blue)] text-white font-display text-[13px] font-black flex items-center justify-center shrink-0 mt-0.5">
-                        {q.question_number}
-                      </span>
-                      <div className="flex-1">
-                        <div className="text-[15px] font-bold text-[var(--text)] leading-snug mb-1.5">
-                          {q.question}
+                {clarifying_questions.map((q) => {
+                  const assistantId = `question-${q.question_number}`
+                  return (
+                    <div key={q.question_number}>
+                      <div 
+                        className="bg-[var(--bg)] rounded-[10px] p-[16px_18px] border-2 border-[var(--border)] transition-colors hover:border-[var(--blue)]"
+                      >
+                        <div className="flex items-start gap-3.5 mb-3">
+                          <span className="w-7 h-7 rounded-full bg-[var(--blue)] text-white font-display text-[13px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                            {q.question_number}
+                          </span>
+                          <div className="flex-1">
+                            <div className="text-[15px] font-bold text-[var(--text)] leading-snug mb-1.5">
+                              {q.question}
+                            </div>
+                            <div className="text-[13px] text-[var(--muted)] italic mb-2">
+                              Linked to: {q.linked_concern}
+                            </div>
+                            <button 
+                              onClick={() => openAIAssistant(assistantId, 'question', q.question, `This question is linked to the "${q.linked_concern}" concern.`)}
+                              className="text-[13px] font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] flex items-center gap-1.5"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" />
+                              Ask AI about this
+                            </button>
+                          </div>
                         </div>
-                        <div className="text-[13px] text-[var(--muted)] italic mb-2">
-                          Linked to: {q.linked_concern}
-                        </div>
-                        <button 
-                          onClick={() => openAIAssistant('question', q.question, `This question is linked to the "${q.linked_concern}" concern.`)}
-                          className="text-[13px] font-semibold text-[var(--orange)] hover:text-[var(--orange-hover)] flex items-center gap-1.5"
-                        >
-                          <MessageSquare className="w-3.5 h-3.5" />
-                          Ask AI about this
-                        </button>
+                        <textarea
+                          value={questionAnswers[q.question_number] || ''}
+                          onChange={(e) => onAnswerChange(q.question_number, e.target.value)}
+                          placeholder="Type your answer here..."
+                          className="w-full py-3 px-4 border-2 border-[var(--border)] rounded-[var(--radius-sm)] font-sans text-sm text-[var(--text)] bg-white transition-all outline-none leading-relaxed resize-y min-h-[80px] form-textarea placeholder:text-[#9ca3af]"
+                        />
                       </div>
+                      {expandedAssistant === assistantId && (
+                        <InlineAIAssistant
+                          context={aiContext}
+                          onClose={() => setExpandedAssistant(null)}
+                        />
+                      )}
                     </div>
-                    <textarea
-                      value={questionAnswers[q.question_number] || ''}
-                      onChange={(e) => onAnswerChange(q.question_number, e.target.value)}
-                      placeholder="Type your answer here..."
-                      className="w-full py-3 px-4 border-2 border-[var(--border)] rounded-[var(--radius-sm)] font-sans text-sm text-[var(--text)] bg-white transition-all outline-none leading-relaxed resize-y min-h-[80px] form-textarea placeholder:text-[#9ca3af]"
-                    />
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
               <div className="text-center mt-6">
@@ -397,12 +422,6 @@ export function EvaluationResults({ data, onGoToCoach, questionAnswers, onAnswer
           )}
         </div>
       </div>
-
-      <AIAssistant
-        isOpen={aiAssistantOpen}
-        onClose={() => setAiAssistantOpen(false)}
-        context={aiContext}
-      />
-    </>
-  )
+    )
+  }
 }
