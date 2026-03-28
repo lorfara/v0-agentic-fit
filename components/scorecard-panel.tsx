@@ -30,7 +30,7 @@ function ScoreRow({ label, value, rationale }: ScoreRowProps) {
   const style = getBadgeStyle(value)
 
   return (
-    <>
+    <div>
       <div className="flex items-center justify-between mb-2.5 flex-wrap gap-1">
         <span 
           className={cn(
@@ -66,7 +66,7 @@ function ScoreRow({ label, value, rationale }: ScoreRowProps) {
             className="w-5 h-5 rounded-full flex items-center justify-center text-[var(--muted)]"
             style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
           >
-            &mdash;
+            —
           </span>
         )}
       </div>
@@ -75,7 +75,7 @@ function ScoreRow({ label, value, rationale }: ScoreRowProps) {
           {rationale}
         </div>
       )}
-    </>
+    </div>
   )
 }
 
@@ -169,7 +169,7 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
                 <span>Low = Strong</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: '#eab308'}}></span>
+                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{backgroundColor: '#eab308'}}></span>
                 <span>Medium = Review</span>
               </div>
               <div className="flex items-center gap-2">
@@ -185,7 +185,7 @@ export function ScorecardPanel({ projectName, scores }: ScorecardPanelProps) {
                   <span>Low</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: '#eab308'}}></span>
+                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{backgroundColor: '#eab308'}}></span>
                   <span>Medium</span>
                 </div>
                 <div className="flex items-center gap-2">
