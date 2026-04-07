@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* AgenticFit Coach Design System */
+  /* AgenticFit Design System */
   --orange: #FF690F;
   --orange-hover: #e55500;
   --orange-light: #fff4ee;

@@ -51,7 +51,7 @@ function AskTheCoach({ itemId, context, openingMessage }: { itemId: string; cont
               <div className="w-7 h-7 rounded-full bg-[var(--orange)] flex items-center justify-center">
                 <MessageSquare className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold text-sm text-[var(--text)]">AgenticFit Coach</span>
+              <span className="font-bold text-sm text-[var(--text)]">AgenticFit</span>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-[var(--muted)] hover:text-[var(--text)] p-1">
               <X className="w-4 h-4" />

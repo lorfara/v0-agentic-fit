@@ -25,7 +25,7 @@ interface InstructorPageProps {
 
 // Mock data for instructor view
 const MOCK_STUDENTS: StudentSubmission[] = [
-  { id: '1', name: 'Lorelei Faria', initials: 'LF', projectName: 'AgenticFit Coach', submittedAt: '2 hours ago', status: 'pending' },
+  { id: '1', name: 'Lorelei Faria', initials: 'LF', projectName: 'AgenticFit', submittedAt: '2 hours ago', status: 'pending' },
   { id: '2', name: 'Marcus Chen', initials: 'MC', projectName: 'CodeReview AI', submittedAt: '3 hours ago', status: 'pending' },
   { id: '3', name: 'Sarah Kim', initials: 'SK', projectName: 'MeetingMind', submittedAt: '5 hours ago', status: 'pending' },
   { id: '4', name: 'Alex Rivera', initials: 'AR', projectName: 'DataPipeline Pro', submittedAt: '1 day ago', status: 'approved' },
