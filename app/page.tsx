@@ -119,7 +119,7 @@ export default function Home() {
   // Navigation steps
   const navSteps: NavStep[] = [
     { id: 'evaluate', label: 'Evaluate', badge: 1, locked: false, done: evaluated },
-    { id: 'coach', label: 'AgenticFit Coach', badge: 2, locked: !evaluated, done: submitted },
+    { id: 'coach', label: 'AgenticFit', badge: 2, locked: !evaluated, done: submitted },
     { id: 'instructor', label: 'Instructor Review', badge: 3, locked: !submitted, done: instructorApproved },
     { id: 'mvp', label: 'Define MVP', badge: 4, locked: !instructorApproved, done: mvpDefined },
     { id: 'buildplan', label: 'Build Plan', badge: 5, locked: !mvpDefined, done: false },

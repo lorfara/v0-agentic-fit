@@ -16,8 +16,8 @@ const nunitoSans = Nunito_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'AgenticFit Coach',
-  description: 'AI-powered capstone project evaluation and coaching for bootcamp students',
+  title: 'AgenticFit',
+  description: 'AI-powered capstone project evaluation for bootcamp students',
 }
 
 export const viewport: Viewport = {

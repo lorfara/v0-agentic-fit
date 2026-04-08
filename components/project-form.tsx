@@ -51,7 +51,7 @@ export function ProjectForm({ data, onChange, onSubmit, isLoading }: ProjectForm
               type="text"
               value={data.name}
               onChange={(e) => updateField('name', e.target.value)}
-              placeholder="e.g. AgenticFit Coach"
+              placeholder="e.g. AgenticFit"
               className="py-3 px-4 border-2 border-[var(--border)] rounded-[var(--radius-sm)] font-sans text-[15px] text-[var(--text)] bg-white transition-all outline-none leading-normal form-input placeholder:text-[#9ca3af]"
             />
           </div>
